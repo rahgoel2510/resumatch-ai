@@ -1,0 +1,17 @@
+# Downloaded HuggingFace models (local cache)
+models/
+
+# Audit logs and feedback
+audit_logs/
+feedback_log.jsonl
+
+# Governance config (user-specific)
+governance.json
+
+# macOS
+.DS_Store
+
+# Python
+venv/
+__pycache__/
+*.pyc

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Analyzer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="mainView">
+    <div class="app-header">
+      <div class="logo">
+        <div class="logo-icon">🎯</div>
+        <div>
+          <h1>Job Analyzer</h1>
+          <div class="subtitle">AI-powered resume matching</div>
+        </div>
+      </div>
+      <div id="statusBadge" class="status-pill">
+        <span class="dot"></span>
+        <span class="status-text">Checking...</span>
+      </div>
+    </div>
+
+    <button id="analyzeBtn" disabled>⚡ Analyze This Job Posting</button>
+
+    <!-- Readiness alert banner -->
+    <div id="readinessAlert" class="readiness-alert" style="display:none">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-body">
+        <div class="alert-title">Backend Not Reachable</div>
+        <div class="alert-msg">Start the server: <code>cd backend && python main.py</code></div>
+      </div>
+      <button id="retryBtn" class="retry-btn">Retry</button>
+    </div>
+
+    <div id="errorBox" class="error-msg"></div>
+
+    <div id="results" class="results">
+      <div id="bestPick" class="best-pick"></div>
+      <div id="cards"></div>
+    </div>
+  </div>
+
+  <!-- Side drawer -->
+  <div id="drawer" class="drawer">
+    <div class="drawer-header">
+      <button class="drawer-close" id="drawerClose">✕</button>
+      <h2 id="drawerTitle">Detailed Analysis</h2>
+    </div>
+    <div id="drawerContent" class="drawer-content"></div>
+  </div>
+  <div id="overlay" class="overlay"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

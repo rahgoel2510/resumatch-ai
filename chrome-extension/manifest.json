@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Job Analyzer - Should I Apply?",
+  "version": "1.0.0",
+  "description": "Analyzes job descriptions using a local RAG pipeline to tell you if you should apply.",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  }
+}
