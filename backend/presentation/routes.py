@@ -1,7 +1,4 @@
-"""Presentation Layer — FastAPI route definitions.
-
-Thin layer: validates input, delegates to service, formats response.
-"""
+"""Presentation Layer — FastAPI route definitions."""
 
 import time
 from fastapi import APIRouter, UploadFile, File
@@ -11,14 +8,14 @@ from presentation.schemas import (
     JobRequest, AnalysisResponse, HealthResponse, UploadResponse, ErrorResponse,
 )
 from services.analysis_service import AnalysisService
+from data.history_store import history_store
 from observability.metrics import metrics_collector
 from observability.feedback import feedback_store, FeedbackEntry
 from observability.success_metrics import success_tracker
 from validation.audit_logger import audit_logger
-from validation.governance import save_governance_policy, GovernancePolicy
+from validation.governance import save_governance_policy
 
 router = APIRouter()
-
 _service: AnalysisService | None = None
 
 
@@ -34,13 +31,28 @@ def _svc() -> AnalysisService:
 
 
 # ------------------------------------------------------------------
-# Core endpoints
+# Core
 # ------------------------------------------------------------------
 
 @router.post("/analyze", response_model=AnalysisResponse)
 async def analyze_job(request: JobRequest):
-    """Analyze a JD against all resumes with full governance pipeline."""
-    return _svc().analyze_job(request.job_description)
+    result = _svc().analyze_job(request.job_description)
+
+    # Save to history
+    best = result.get("resumes", [{}])[0] if result.get("resumes") else {}
+    history_id = history_store.save(
+        job_url=request.job_url,
+        job_title=request.job_title,
+        company=request.company,
+        jd_snippet=request.job_description[:500],
+        best_resume=result.get("best_resume", ""),
+        best_score=best.get("combined_score", 0),
+        best_verdict=best.get("verdict", ""),
+        resume_count=len(result.get("resumes", [])),
+        results=result.get("resumes", []),
+    )
+    result["history_id"] = history_id
+    return result
 
 
 @router.post("/upload-resume", response_model=UploadResponse | ErrorResponse)
@@ -58,14 +70,38 @@ async def health():
 
 
 # ------------------------------------------------------------------
-# Governance endpoints
+# History
 # ------------------------------------------------------------------
 
-@router.get("/governance/policy")
-async def get_governance_policy():
-    """Get current governance policy configuration."""
-    return _svc().governance_policy.to_dict()
+@router.get("/history")
+async def list_history(limit: int = 50, offset: int = 0, q: str = ""):
+    """List or search analysis history."""
+    if q:
+        entries = history_store.search(q, limit=limit)
+    else:
+        entries = history_store.list_recent(limit=limit, offset=offset)
+    return {"entries": entries, "total": history_store.count()}
 
+
+@router.get("/history/{entry_id}")
+async def get_history_entry(entry_id: str):
+    """Get a single history entry with full analysis results."""
+    entry = history_store.get_by_id(entry_id)
+    if not entry:
+        return {"error": "Not found"}
+    return entry
+
+
+@router.delete("/history/{entry_id}")
+async def delete_history_entry(entry_id: str):
+    """Delete a history entry."""
+    deleted = history_store.delete(entry_id)
+    return {"deleted": deleted}
+
+
+# ------------------------------------------------------------------
+# Governance
+# ------------------------------------------------------------------
 
 class PolicyUpdateRequest(BaseModel):
     min_confidence_score: float | None = None
@@ -79,12 +115,15 @@ class PolicyUpdateRequest(BaseModel):
     max_resume_size_chars: int | None = None
 
 
+@router.get("/governance/policy")
+async def get_governance_policy():
+    return _svc().governance_policy.to_dict()
+
+
 @router.patch("/governance/policy")
 async def update_governance_policy(req: PolicyUpdateRequest):
-    """Update governance policy thresholds."""
     policy = _svc().governance_policy
-    updates = req.model_dump(exclude_none=True)
-    for key, value in updates.items():
+    for key, value in req.model_dump(exclude_none=True).items():
         if hasattr(policy, key):
             setattr(policy, key, value)
     save_governance_policy(policy)
@@ -92,24 +131,21 @@ async def update_governance_policy(req: PolicyUpdateRequest):
 
 
 # ------------------------------------------------------------------
-# Observability endpoints
+# Observability
 # ------------------------------------------------------------------
 
 @router.get("/metrics")
 async def get_metrics():
-    """Pipeline performance metrics."""
     return metrics_collector.get_summary()
 
 
 @router.get("/dashboard")
 async def get_dashboard():
-    """Full KPI dashboard — latency, quality, governance, safety."""
     return success_tracker.get_dashboard()
 
 
 @router.get("/audit")
 async def get_audit(n: int = 20):
-    """Recent audit log entries."""
     return {"entries": audit_logger.get_recent(n)}
 
 
@@ -124,7 +160,6 @@ class FeedbackRequest(BaseModel):
 
 @router.post("/feedback")
 async def submit_feedback(req: FeedbackRequest):
-    """Submit user feedback for continuous improvement."""
     feedback_store.record(FeedbackEntry(
         timestamp=time.time(),
         resume_filename=req.resume_filename,
@@ -139,5 +174,4 @@ async def submit_feedback(req: FeedbackRequest):
 
 @router.get("/feedback/stats")
 async def feedback_stats():
-    """Feedback accuracy statistics."""
     return feedback_store.get_accuracy_stats()

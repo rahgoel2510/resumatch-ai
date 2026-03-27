@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Job Analyzer</title>
+  <title>ResuMatch AI</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="sidepanel.css">
 </head>
-<body>
+<body class="sidepanel-body">
   <div id="mainView">
     <div class="app-header">
       <div class="logo">
@@ -22,13 +23,11 @@
       </div>
     </div>
 
-    <!-- Tab bar -->
     <div class="tab-bar">
       <button class="tab active" id="tabAnalyze" data-tab="analyze">⚡ Analyze</button>
       <button class="tab" id="tabHistory" data-tab="history">📋 History</button>
     </div>
 
-    <!-- Analyze tab -->
     <div id="analyzeTab" class="tab-content active">
       <button id="analyzeBtn" disabled>⚡ Analyze This Job Posting</button>
 
@@ -49,22 +48,20 @@
       </div>
     </div>
 
-    <!-- History tab -->
     <div id="historyTab" class="tab-content">
       <div class="history-search">
         <input id="historySearch" type="text" placeholder="Search by title, company, verdict...">
       </div>
-      <div id="historyList" class="history-list">
-        <div class="loading"><div class="loading-spinner"></div>Loading history...</div>
-      </div>
+      <div id="historyList" class="history-list"></div>
     </div>
   </div>
 
-  <!-- Side drawer -->
+  <!-- Drawer (inline in side panel, no overlay needed) -->
   <div id="drawer" class="drawer">
     <div class="drawer-header">
       <button class="drawer-close" id="drawerClose">✕</button>
       <h2 id="drawerTitle">Detailed Analysis</h2>
+      <button class="copy-btn" id="copyBtn" title="Copy analysis">📋</button>
     </div>
     <div id="drawerContent" class="drawer-content"></div>
   </div>

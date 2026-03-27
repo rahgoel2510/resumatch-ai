@@ -1,30 +1,10 @@
 """
-Entry point — wires the refined 3-layer RAG architecture.
+ResuMatch AI — Entry point.
 
-┌──────────────────────────────────────────────────────────────────┐
-│  PRESENTATION (presentation/)                                    │
-│  FastAPI routes, Pydantic schemas, HTTP concerns                 │
-├──────────────────────────────────────────────────────────────────┤
-│  SERVICES (services/)                                            │
-│  Analysis orchestration, JD cleaning, LLM inference              │
-├──────────────────────────────────────────────────────────────────┤
-│  A) KNOWLEDGE LAYER (knowledge/)                                 │
-│     Document ingestion, PII redaction, RBAC tagging              │
-│                                                                  │
-│  B) RETRIEVAL LAYER (retrieval/)                                 │
-│     Vector store + namespace isolation, query sanitization,      │
-│     top-k retrieval with access control + domain filters         │
-│                                                                  │
-│  C) VALIDATION LAYER (validation/)                               │
-│     Guardrails (PII + policy), confidence scoring + fallback,    │
-│     output sanitization, audit logging + anomaly detection       │
-├──────────────────────────────────────────────────────────────────┤
-│  OBSERVABILITY (observability/)                                  │
-│  Metrics tracking, feedback loop, anomaly detection              │
-├──────────────────────────────────────────────────────────────────┤
-│  DATA ACCESS (data/)                                             │
-│  Model loading, resume file I/O                                  │
-└──────────────────────────────────────────────────────────────────┘
+Starts the FastAPI server with:
+  - Full 3-layer RAG pipeline initialization
+  - Background file watcher on resume_data/ (auto re-indexes on changes)
+  - Cross-platform background service support (macOS launchd / Windows NSSM)
 """
 
 from contextlib import asynccontextmanager
@@ -33,22 +13,29 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config import HOST, PORT
 from services.analysis_service import AnalysisService
+from services.resume_watcher import ResumeWatcher
 from presentation.routes import router, set_service
 
 analysis_service = AnalysisService()
+resume_watcher = ResumeWatcher(
+    rebuild_callback=analysis_service.rebuild_indexes,
+    debounce_seconds=3.0,
+)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     analysis_service.initialize()
     set_service(analysis_service)
+    resume_watcher.start()
     yield
+    resume_watcher.stop()
 
 
 app = FastAPI(
-    title="Job Analyzer RAG API",
-    description="Refined 3-layer local RAG pipeline with guardrails, RBAC, and observability",
-    version="3.0.0",
+    title="ResuMatch AI",
+    description="Local RAG pipeline for resume-to-JD matching with auto-reindexing",
+    version="3.1.0",
     lifespan=lifespan,
 )
 

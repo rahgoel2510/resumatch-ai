@@ -256,7 +256,24 @@ function init() {
       target: { tabId: tab.id },
       func: injectedExtractor,
     });
-    return results[0].result;
+    var text = results[0].result || "";
+
+    // Extract metadata from the tab
+    var pageUrl = tab.url || "";
+    var pageTitle = tab.title || "";
+
+    // Try to parse title/company from common patterns
+    // LinkedIn: "Job Title at Company | LinkedIn"
+    // Indeed: "Job Title - Company - Location | Indeed.com"
+    var jobTitle = "";
+    var company = "";
+    var parts = pageTitle.split(/\s+(?:at|-|·|\|)\s+/);
+    if (parts.length >= 2) {
+      jobTitle = parts[0].trim();
+      company = parts[1].replace(/\s*\|.*$/, "").replace(/\s*[-–].*$/, "").trim();
+    }
+
+    return { text: text, url: pageUrl, title: jobTitle, company: company };
   }
 
   // ---- Helpers ----
@@ -429,7 +446,8 @@ function init() {
     if (resultsDiv) resultsDiv.style.display = "block";
 
     try {
-      var pageText = await extractPageText();
+      var extracted = await extractPageText();
+      var pageText = extracted.text;
       if (!pageText || pageText.trim().length < 50) {
         throw new Error("Could not extract enough text. Make sure you're on a job posting page and the description is visible.");
       }
@@ -446,7 +464,12 @@ function init() {
       var res = await fetch(apiUrl + "/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ job_description: jd }),
+        body: JSON.stringify({
+          job_description: jd,
+          job_url: extracted.url,
+          job_title: extracted.title,
+          company: extracted.company,
+        }),
       });
       if (!res.ok) throw new Error("Server returned " + res.status);
       analysisData = await res.json();
@@ -476,5 +499,199 @@ function init() {
       analyzeBtn.textContent = "⚡ Analyze This Job Posting";
     }
   });
+
+  // ---- Tab switching ----
+  var tabs = document.querySelectorAll(".tab");
+  var tabContents = document.querySelectorAll(".tab-content");
+  tabs.forEach(function(tab) {
+    tab.addEventListener("click", function() {
+      var target = tab.dataset.tab;
+      tabs.forEach(function(t) { t.classList.remove("active"); });
+      tabContents.forEach(function(tc) { tc.classList.remove("active"); });
+      tab.classList.add("active");
+      var targetEl = document.getElementById(target + "Tab");
+      if (targetEl) targetEl.classList.add("active");
+      if (target === "history") loadHistory();
+    });
+  });
+
+  // ---- History ----
+  var historyList = document.getElementById("historyList");
+  var historySearch = document.getElementById("historySearch");
+  var searchTimeout = null;
+
+  if (historySearch) {
+    historySearch.addEventListener("input", function() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(function() { loadHistory(historySearch.value); }, 300);
+    });
+  }
+
+  function formatDate(ts) {
+    var d = new Date(ts * 1000);
+    var now = new Date();
+    var diff = now - d;
+    if (diff < 3600000) return Math.floor(diff / 60000) + "m ago";
+    if (diff < 86400000) return Math.floor(diff / 3600000) + "h ago";
+    if (diff < 604800000) return Math.floor(diff / 86400000) + "d ago";
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  }
+
+  // ---- Job portal detection ----
+  function getPortalInfo(url) {
+    if (!url) return { icon: "💼", name: "Job Portal", color: "#94a3b8" };
+    var u = url.toLowerCase();
+    if (u.includes("linkedin.com")) return { icon: "🔵", name: "LinkedIn", color: "#0a66c2" };
+    if (u.includes("indeed.com")) return { icon: "🟣", name: "Indeed", color: "#6c3baa" };
+    if (u.includes("glassdoor.com")) return { icon: "🟢", name: "Glassdoor", color: "#0caa41" };
+    if (u.includes("naukri.com")) return { icon: "🔴", name: "Naukri", color: "#e14b4b" };
+    if (u.includes("lever.co")) return { icon: "🟡", name: "Lever", color: "#f5a623" };
+    if (u.includes("greenhouse.io")) return { icon: "🌿", name: "Greenhouse", color: "#3b8427" };
+    if (u.includes("workday.com") || u.includes("myworkdayjobs")) return { icon: "🔶", name: "Workday", color: "#f5820d" };
+    if (u.includes("angel.co") || u.includes("wellfound")) return { icon: "😇", name: "Wellfound", color: "#000" };
+    if (u.includes("dice.com")) return { icon: "🎲", name: "Dice", color: "#eb1c26" };
+    return { icon: "💼", name: "Job Portal", color: "#94a3b8" };
+  }
+
+  function buildScoreRing(score) {
+    // SVG circular progress ring
+    var r = 18, c = 2 * Math.PI * r;
+    var pct = Math.min(score, 100);
+    var offset = c - (pct / 100) * c;
+    var color = pct >= 65 ? "#34d399" : pct >= 40 ? "#fbbf24" : "#f87171";
+    return '<svg class="score-ring" width="48" height="48" viewBox="0 0 48 48">' +
+      '<circle cx="24" cy="24" r="' + r + '" fill="none" stroke="rgba(148,163,184,0.1)" stroke-width="3"/>' +
+      '<circle cx="24" cy="24" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="3" ' +
+        'stroke-dasharray="' + c + '" stroke-dashoffset="' + offset + '" ' +
+        'stroke-linecap="round" transform="rotate(-90 24 24)" style="transition:stroke-dashoffset 0.6s ease"/>' +
+      '<text x="24" y="26" text-anchor="middle" fill="' + color + '" font-size="12" font-weight="800">' + score + '</text>' +
+    '</svg>';
+  }
+
+  async function loadHistory(query) {
+    if (!historyList) return;
+    historyList.innerHTML = '<div class="loading"><div class="loading-spinner"></div>Loading...</div>';
+
+    try {
+      var url = apiUrl + "/history?limit=50";
+      if (query) url += "&q=" + encodeURIComponent(query);
+      var res = await fetch(url);
+      var data = await res.json();
+
+      if (!data.entries || data.entries.length === 0) {
+        historyList.innerHTML = '<div class="history-empty">' +
+          '<div style="font-size:32px;margin-bottom:12px">📋</div>' +
+          '<div style="font-size:14px;font-weight:600;color:var(--text-secondary);margin-bottom:4px">No History Yet</div>' +
+          '<div style="font-size:12px">Analyze a job posting to start building your history.</div>' +
+        '</div>';
+        return;
+      }
+
+      var html = '<div class="history-count">' +
+        '<span style="font-weight:700;color:var(--accent-blue)">' + data.total + '</span> analyses tracked</div>';
+
+      data.entries.forEach(function(e) {
+        var portal = getPortalInfo(e.job_url);
+        var title = e.job_title || "Untitled Position";
+        if (title.length > 55) title = title.substring(0, 55) + "…";
+        var comp = e.company || "Unknown Company";
+        var vcls = vc(e.best_verdict || "");
+        var resumeName = e.best_resume || "—";
+        if (resumeName.length > 30) resumeName = resumeName.substring(0, 27) + "…";
+
+        html += '<div class="history-card" data-id="' + e.id + '">' +
+
+          // Left: score ring
+          '<div class="hc-ring">' + buildScoreRing(e.best_score) + '</div>' +
+
+          // Center: job info
+          '<div class="hc-body">' +
+            '<div class="hc-title-row">' +
+              '<span class="hc-title">' + title + '</span>' +
+            '</div>' +
+            '<div class="hc-company-row">' +
+              '<span class="hc-portal-badge" style="color:' + portal.color + '">' + portal.icon + ' ' + portal.name + '</span>' +
+              '<span class="hc-dot">·</span>' +
+              '<span class="hc-company">' + comp + '</span>' +
+            '</div>' +
+            '<div class="hc-bottom-row">' +
+              '<span class="verdict-badge ' + vcls + '" style="font-size:9px;padding:2px 8px">' + (e.best_verdict || "N/A") + '</span>' +
+              '<span class="hc-resume-pill">📄 ' + resumeName + '</span>' +
+              '<span class="hc-resumes-count">' + e.resume_count + ' compared</span>' +
+            '</div>' +
+          '</div>' +
+
+          // Right: date + link
+          '<div class="hc-right">' +
+            '<div class="hc-date">' + formatDate(e.created_at) + '</div>' +
+            (e.job_url ? '<a class="hc-link" href="' + e.job_url + '" target="_blank" title="Open job posting">↗</a>' : '') +
+          '</div>' +
+
+        '</div>';
+      });
+
+      historyList.innerHTML = html;
+
+      // Card click → open detail (but not if clicking the link)
+      historyList.querySelectorAll(".history-card").forEach(function(card) {
+        card.addEventListener("click", function(ev) {
+          if (ev.target.classList.contains("hc-link")) return; // let link open normally
+          loadHistoryDetail(card.dataset.id);
+        });
+      });
+
+      // Prevent link clicks from bubbling to card
+      historyList.querySelectorAll(".hc-link").forEach(function(link) {
+        link.addEventListener("click", function(ev) { ev.stopPropagation(); });
+      });
+
+    } catch (err) {
+      historyList.innerHTML = '<div class="history-empty">Failed to load history: ' + err.message + '</div>';
+    }
+  }
+
+  async function loadHistoryDetail(entryId) {
+    try {
+      var res = await fetch(apiUrl + "/history/" + entryId);
+      var entry = await res.json();
+      if (entry.error) return;
+
+      // Open drawer with the best resume's full results
+      if (entry.results && entry.results.length > 0) {
+        // Show all resumes in drawer
+        var title = (entry.job_title || "Job Analysis") + (entry.company ? " — " + entry.company : "");
+        if (drawerTitle) drawerTitle.textContent = title;
+
+        var h = "";
+        if (entry.job_url) {
+          h += '<div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">🔗 ' + entry.job_url + '</div>';
+        }
+        h += '<div style="font-size:10px;color:var(--text-muted);margin-bottom:16px">' + formatDate(entry.created_at) + '</div>';
+
+        entry.results.forEach(function(r, i) {
+          var isWinner = i === 0;
+          h += '<div style="margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border-subtle)">';
+          h += '<div style="font-weight:600;font-size:13px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center">' +
+            '<span>📄 ' + r.filename + '</span>' +
+            '<span>' + (isWinner ? '<span class="best-tag" style="margin-right:4px">Best</span>' : '') +
+            '<span class="verdict-badge ' + vc(r.verdict) + '">' + r.verdict + '</span></span></div>';
+          h += buildDrawerHTML(r);
+          h += '</div>';
+        });
+
+        if (drawerContent) drawerContent.innerHTML = h;
+        if (drawer) drawer.classList.add("open");
+        if (overlay) overlay.classList.add("open");
+
+        setTimeout(function() {
+          if (drawerContent) drawerContent.querySelectorAll(".bar-fill").forEach(function(el) {
+            el.style.width = el.dataset.width;
+          });
+        }, 50);
+      }
+    } catch (err) {
+      console.error("Failed to load history detail:", err);
+    }
+  }
 
 } // end init()

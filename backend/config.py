@@ -30,3 +30,6 @@ FEEDBACK_FILE = os.path.join(_BASE_DIR, "feedback_log.jsonl")
 
 # Governance
 GOVERNANCE_CONFIG_FILE = os.path.join(_BASE_DIR, "governance.json")
+
+# History
+HISTORY_DB_PATH = os.path.join(_BASE_DIR, "history.db")

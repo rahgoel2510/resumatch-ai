@@ -5,6 +5,9 @@ from pydantic import BaseModel
 
 class JobRequest(BaseModel):
     job_description: str
+    job_url: str = ""
+    job_title: str = ""
+    company: str = ""
 
 
 class ResumeResult(BaseModel):
@@ -44,6 +47,7 @@ class AnalysisResponse(BaseModel):
     best_resume: str | None
     recommendation: str
     governance: GovernanceInfo | None = None
+    history_id: str = ""
 
 
 class HealthResponse(BaseModel):

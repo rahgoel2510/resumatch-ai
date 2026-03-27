@@ -8,6 +8,9 @@ feedback_log.jsonl
 # Governance config (user-specific)
 governance.json
 
+# History database
+history.db
+
 # macOS
 .DS_Store
 
