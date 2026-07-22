@@ -1,35 +1,41 @@
 {
   "manifest_version": 3,
-  "name": "ResuMatch AI — ATS Resume Analyzer",
-  "version": "2.0.0",
-  "description": "AI-powered resume analyzer. Get ATS scores, skill gap analysis, and tailoring suggestions for any job posting. 100% local & private.",
-  "permissions": ["activeTab", "scripting", "storage", "sidePanel"],
+  "name": "RG Aide",
+  "version": "1.0.0",
+  "description": "Free AI sidebar assistant by Rahul Goel. Page context, summarize, extract, private session memory.",
+
+  "permissions": [
+    "storage",
+    "sidePanel",
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+
+  "host_permissions": [
+    "<all_urls>"
+  ],
+
   "action": {
     "default_icon": {
+      "16": "icon16.png",
       "48": "icon48.png",
       "128": "icon128.png"
-    }
+    },
+    "default_title": "Open RG Aide"
   },
+
   "side_panel": {
     "default_path": "sidepanel.html"
   },
+
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "js": ["fab.js"],
-      "css": ["fab.css"],
-      "run_at": "document_idle"
-    }
-  ],
+
   "icons": {
+    "16": "icon16.png",
     "48": "icon48.png",
     "128": "icon128.png"
-  },
-  "options_ui": {
-    "page": "options.html",
-    "open_in_tab": false
   }
 }

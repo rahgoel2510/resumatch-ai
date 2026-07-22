@@ -1,0 +1,128 @@
+// ═══════════════════════════════════════════════════════════════
+// RG Aide — Options Page (SCSS)
+// Copyright (c) 2026 Rahul Goel. MIT License.
+// ═══════════════════════════════════════════════════════════════
+//
+// COMPILE: sass options.scss options.css
+// Shares the same design tokens as aide.scss
+// ═══════════════════════════════════════════════════════════════
+
+// ─── Shared Variables (same as aide.scss) ───────────────────
+$bg-base: #1a1a2e;
+$bg-input: #0d1b3e;
+$text-primary: #e8eaf6;
+$text-secondary: #9fa8c7;
+$text-muted: #6b7394;
+$accent: #5b7cfa;
+$accent-hover: #7b96ff;
+$success: #4caf50;
+$error: #ef5350;
+$border: rgba(255, 255, 255, 0.08);
+$radius: 8px;
+$font-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+// ─── Base ──────────────────────────────────────────────────────
+body {
+  font-family: $font-stack;
+  background: $bg-base;
+  color: $text-primary;
+  padding: 24px;
+  min-width: 380px;
+}
+
+.container {
+  max-width: 400px;
+}
+
+h1 {
+  font-size: 16px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+// ─── Form Fields ───────────────────────────────────────────────
+.field {
+  margin-bottom: 16px;
+
+  label {
+    display: block;
+    font-size: 12px;
+    color: $text-secondary;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  input {
+    width: 100%;
+    padding: 9px 12px;
+    background: $bg-input;
+    border: 1px solid $border;
+    border-radius: $radius;
+    color: $text-primary;
+    font-size: 13px;
+    font-family: monospace;
+    outline: none;
+
+    &:focus {
+      border-color: $accent;
+    }
+  }
+}
+
+.hint {
+  font-size: 11px;
+  color: $text-muted;
+  margin-top: 6px;
+
+  a {
+    color: $accent;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// ─── Actions ───────────────────────────────────────────────────
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+button {
+  padding: 8px 18px;
+  background: $accent;
+  color: white;
+  border: none;
+  border-radius: $radius;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: $accent-hover;
+  }
+}
+
+.btn-danger {
+  background: $error;
+
+  &:hover {
+    background: #e53935; // $error darkened 5%
+  }
+}
+
+.status {
+  font-size: 12px;
+  color: $success;
+  transition: opacity 300ms;
+}
+
+// ─── Footer ────────────────────────────────────────────────────
+.footer {
+  font-size: 11px;
+  color: $text-muted;
+}

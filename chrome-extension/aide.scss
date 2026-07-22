@@ -1,0 +1,327 @@
+// ═══════════════════════════════════════════════════════════════
+// RG Aide — Stylesheet (SCSS)
+// Copyright (c) 2026 Rahul Goel. MIT License.
+// ═══════════════════════════════════════════════════════════════
+
+// ─── VARIABLES ─────────────────────────────────────────────────
+$bg-base: #1a1a2e;
+$bg-surface: #16213e;
+$bg-elevated: #1e2a4a;
+$bg-input: #0d1b3e;
+$bg-hover: #243b6e;
+
+$text-primary: #e8eaf6;
+$text-secondary: #9fa8c7;
+$text-muted: #6b7394;
+
+$accent: #5b7cfa;
+$accent-hover: #7b96ff;
+$accent-soft: rgba(91, 124, 250, 0.12);
+$success: #4caf50;
+$error: #ef5350;
+$warning: #ff9800;
+
+$border: rgba(255, 255, 255, 0.08);
+$border-light: rgba(255, 255, 255, 0.12);
+$radius: 8px;
+$radius-lg: 12px;
+$font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+// ─── MIXINS ───────────────────────────────────────────────────
+@mixin flex-center { display: flex; align-items: center; justify-content: center; }
+@mixin flex-between { display: flex; align-items: center; justify-content: space-between; }
+
+// ─── RESET & BASE ─────────────────────────────────────────────
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: $font;
+  font-size: 13px;
+  line-height: 1.5;
+  color: $text-primary;
+  background: $bg-base;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app { height: 100vh; display: flex; flex-direction: column; }
+.screen { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+// ─── SETUP SCREEN ─────────────────────────────────────────────
+.setup-container {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px; text-align: center;
+}
+.setup-logo { margin-bottom: 16px; img { border-radius: $radius-lg; box-shadow: 0 4px 20px rgba($accent, 0.2); } }
+.setup-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.setup-subtitle { color: $text-secondary; margin-bottom: 24px; font-size: 13px; }
+.setup-card {
+  width: 100%; max-width: 320px;
+  background: $bg-surface; border: 1px solid $border;
+  border-radius: $radius; padding: 14px; margin-bottom: 12px; text-align: left;
+  input { width: 100%; padding: 9px 12px; background: $bg-input; border: 1px solid $border; border-radius: $radius; color: $text-primary; font-size: 13px; font-family: monospace; outline: none; &:focus { border-color: $accent; } }
+}
+.setup-step { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-weight: 500; font-size: 12.5px; }
+.step-num { width: 22px; height: 22px; @include flex-center; background: $accent; color: white; border-radius: 50%; font-size: 11px; font-weight: 700; }
+.setup-link { display: block; color: $accent; font-size: 12px; text-decoration: none; &:hover { text-decoration: underline; } }
+.error-text { color: $error; font-size: 11px; margin-top: 6px; min-height: 16px; }
+.btn-primary { width: 100%; max-width: 320px; padding: 12px; background: $accent; color: white; border: none; border-radius: $radius; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; &:hover { background: $accent-hover; } }
+.setup-footer { margin-top: 16px; font-size: 11px; color: $text-muted; }
+
+// ─── TOPBAR ───────────────────────────────────────────────────
+.topbar {
+  @include flex-between;
+  padding: 8px 12px;
+  background: $bg-surface;
+  border-bottom: 1px solid $border;
+  flex-shrink: 0;
+}
+.topbar-left { display: flex; align-items: center; gap: 8px; }
+.topbar-title { font-size: 13px; font-weight: 600; }
+.topbar-right { display: flex; align-items: center; gap: 6px; }
+.model-select {
+  background: $bg-input; border: 1px solid $border; border-radius: $radius;
+  color: $text-primary; font-size: 11px; padding: 4px 6px; outline: none;
+  max-width: 150px; cursor: pointer;
+  &:focus { border-color: $accent; }
+}
+.icon-btn {
+  width: 28px; height: 28px; @include flex-center;
+  border: none; border-radius: 6px; background: transparent;
+  color: $text-secondary; cursor: pointer;
+  &:hover { background: $bg-elevated; color: $text-primary; }
+}
+
+// ─── CHAT AREA ────────────────────────────────────────────────
+.chat-area {
+  flex: 1; overflow-y: auto; padding: 16px 12px;
+  display: flex; flex-direction: column;
+}
+
+// Welcome state
+.welcome-state {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center;
+  padding: 20px 0;
+}
+.welcome-icon { font-size: 36px; margin-bottom: 12px; }
+.welcome-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+.welcome-desc { font-size: 12.5px; color: $text-secondary; max-width: 260px; margin-bottom: 20px; }
+
+// Suggested prompt chips (Amazon Q style)
+.prompt-chips {
+  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 320px;
+}
+.chip {
+  padding: 8px 14px;
+  background: $bg-surface; border: 1px solid $border;
+  border-radius: 20px; color: $text-secondary;
+  font-size: 12px; cursor: pointer;
+  transition: all 150ms;
+  &:hover { background: $accent-soft; border-color: $accent; color: $text-primary; }
+}
+
+// Chat messages
+.chat-messages {
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.message {
+  display: flex; gap: 10px;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; } }
+
+.msg-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  @include flex-center; font-size: 12px; flex-shrink: 0;
+  &.user { background: $accent; color: white; }
+  &.ai { background: $bg-elevated; border: 1px solid $border; }
+}
+
+.msg-body { flex: 1; min-width: 0; }
+
+.msg-content {
+  font-size: 13px; line-height: 1.6; word-wrap: break-word;
+  .message.user & { background: $bg-elevated; border: 1px solid $border; border-radius: $radius; padding: 8px 12px; }
+  .message.ai & { padding: 4px 0; }
+  code { background: $bg-input; padding: 1px 5px; border-radius: 4px; font-size: 12px; font-family: monospace; }
+  pre { background: $bg-input; border: 1px solid $border; border-radius: $radius; padding: 10px; margin: 8px 0; overflow-x: auto; font-size: 12px; font-family: monospace; }
+  strong { color: $text-primary; }
+}
+
+// Message action buttons (copy, regenerate)
+.msg-actions {
+  display: flex; gap: 4px; margin-top: 6px; opacity: 0;
+  transition: opacity 150ms;
+  .message:hover & { opacity: 1; }
+}
+.msg-action-btn {
+  padding: 3px 8px; background: $bg-elevated; border: 1px solid $border;
+  border-radius: 4px; color: $text-muted; font-size: 10.5px;
+  cursor: pointer; display: flex; align-items: center; gap: 3px;
+  &:hover { color: $text-primary; border-color: $border-light; }
+  &.copied { color: $success; border-color: $success; }
+}
+
+// Typing indicator
+.typing-dots { display: flex; gap: 4px; padding: 8px 0; }
+.typing-dots span {
+  width: 6px; height: 6px; border-radius: 50%; background: $text-muted;
+  animation: bounce 1s infinite;
+  &:nth-child(2) { animation-delay: 0.15s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
+}
+@keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+
+// Page context badge on messages
+.msg-context-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; background: $accent-soft; border-radius: 4px;
+  font-size: 10px; color: $accent; margin-bottom: 6px;
+  svg { width: 10px; height: 10px; }
+}
+
+// ─── INPUT AREA ───────────────────────────────────────────────
+.input-area {
+  flex-shrink: 0; padding: 10px 12px 8px;
+  background: $bg-surface; border-top: 1px solid $border;
+}
+
+.attach-bar {
+  display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 6px;
+  &:empty { display: none; }
+}
+.attach-chip {
+  display: flex; align-items: center; gap: 4px;
+  padding: 3px 8px; background: $bg-elevated; border: 1px solid $border;
+  border-radius: 4px; font-size: 11px; color: $text-secondary;
+  .remove-chip { cursor: pointer; color: $text-muted; &:hover { color: $error; } }
+}
+
+.input-row { display: flex; align-items: flex-end; gap: 6px; }
+
+.ctx-btn {
+  width: 30px; height: 30px; @include flex-center;
+  border: 1px solid $border; border-radius: 6px;
+  background: transparent; color: $text-muted; cursor: pointer;
+  flex-shrink: 0; transition: all 150ms;
+  &:hover { color: $accent; border-color: $accent; background: $accent-soft; }
+  &.active { color: $accent; border-color: $accent; background: $accent-soft; }
+}
+
+.chat-input {
+  flex: 1; min-height: 34px; max-height: 100px;
+  padding: 7px 12px; background: $bg-input; border: 1px solid $border;
+  border-radius: $radius; color: $text-primary;
+  font-size: 13px; font-family: $font; line-height: 1.4;
+  resize: none; outline: none;
+  &:focus { border-color: $accent; }
+  &::placeholder { color: $text-muted; }
+}
+
+.send-btn {
+  width: 30px; height: 30px; @include flex-center;
+  border: none; border-radius: 6px;
+  background: $accent; color: white; cursor: pointer; flex-shrink: 0;
+  &:disabled { opacity: 0.3; cursor: not-allowed; }
+  &:not(:disabled):hover { background: $accent-hover; }
+}
+
+.input-meta {
+  @include flex-between;
+  margin-top: 5px; padding: 0 2px;
+}
+.memory-badge { font-size: 10.5px; color: $text-muted; }
+.input-hint { font-size: 10px; color: $text-muted; }
+
+// ─── SETTINGS PANEL (professional slide-over) ─────────────────
+.settings-panel {
+  position: fixed; inset: 0; z-index: 100;
+  display: none;
+  &.open { display: block; }
+}
+
+.settings-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.5); backdrop-filter: blur(2px);
+}
+
+.settings-drawer {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 290px;
+  background: $bg-surface; border-left: 1px solid $border;
+  display: flex; flex-direction: column;
+  animation: slideIn 0.25s ease;
+}
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+.settings-header {
+  @include flex-between;
+  padding: 14px 16px; border-bottom: 1px solid $border;
+  h2 { font-size: 15px; font-weight: 600; }
+}
+
+.settings-body {
+  flex: 1; overflow-y: auto; padding: 16px;
+}
+
+.s-section {
+  margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid $border;
+  &:last-child { border-bottom: none; }
+}
+
+.s-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.6px; color: $text-muted; margin-bottom: 10px;
+}
+
+.s-select, .s-input {
+  width: 100%; padding: 8px 10px;
+  background: $bg-input; border: 1px solid $border; border-radius: $radius;
+  color: $text-primary; font-size: 12px; outline: none;
+  &:focus { border-color: $accent; }
+}
+.s-select { cursor: pointer; }
+
+.s-key-row { display: flex; gap: 8px; }
+.s-key-row .s-input { flex: 1; font-family: monospace; }
+
+.s-btn {
+  padding: 8px 14px; background: $accent; color: white;
+  border: none; border-radius: $radius; font-size: 12px;
+  font-weight: 600; cursor: pointer;
+  &:hover { background: $accent-hover; }
+}
+
+.s-hint { font-size: 10.5px; color: $text-muted; margin-top: 5px; }
+.s-status { font-size: 11px; margin-top: 6px; &.ok { color: $success; } &.err { color: $error; } }
+
+// Toggle switch
+.s-toggle-row {
+  @include flex-between; padding: 6px 0; font-size: 12.5px; color: $text-secondary;
+}
+.s-toggle {
+  position: relative; width: 34px; height: 18px; display: inline-block;
+  input { opacity: 0; width: 0; height: 0; }
+}
+.s-slider {
+  position: absolute; inset: 0; background: $bg-base; border: 1px solid $border;
+  border-radius: 9px; cursor: pointer; transition: all 150ms;
+  &::before {
+    content: ''; position: absolute; width: 12px; height: 12px;
+    left: 2px; bottom: 2px; background: $text-muted;
+    border-radius: 50%; transition: all 150ms;
+  }
+}
+.s-toggle input:checked + .s-slider { background: $accent; border-color: $accent; }
+.s-toggle input:checked + .s-slider::before { transform: translateX(16px); background: white; }
+
+.s-about p { font-size: 12px; color: $text-secondary; margin-bottom: 4px; }
+
+// ─── UTILITIES ────────────────────────────────────────────────
+.hidden { display: none !important; }
