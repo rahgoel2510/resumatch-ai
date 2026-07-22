@@ -102,9 +102,29 @@ html, body {
 .topbar-right { display: flex; align-items: center; gap: 6px; }
 .model-select {
   background: $bg-input; border: 1px solid $border; border-radius: $radius;
-  color: $text-primary; font-size: 12px; padding: 5px 8px; outline: none;
+  color: $text-primary; font-size: 12px; padding: 5px 24px 5px 8px; outline: none;
   max-width: 160px; cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
   &:focus { border-color: $accent; }
+  option { padding: 8px; }
+}
+
+// Smart model comparison panel (opened from settings)
+.model-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border: 1px solid $border; border-radius: $radius;
+  margin-bottom: 8px; cursor: pointer; transition: all 150ms;
+  &:hover { border-color: $accent-border; background: $accent-soft; }
+  &.selected { border-color: $accent; background: $accent-soft; }
+}
+.model-card-info { flex: 1; min-width: 0; }
+.model-card-name { font-size: 12px; font-weight: 600; color: $text-primary; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.model-card-meta { font-size: 10px; color: $text-muted; }
+.model-card-badge {
+  padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 700; letter-spacing: 0.3px;
+  &.free { background: #d1fae5; color: #065f46; }
 }
 .icon-btn {
   width: 30px; height: 30px; @include flex-center;
@@ -231,12 +251,26 @@ html, body {
 
 .ctx-btn {
   width: 28px; height: 28px; @include flex-center;
-  border: 1px solid $border; border-radius: 6px;
-  background: $white; color: $text-muted; cursor: pointer;
+  border: none; border-radius: 6px;
+  background: transparent; cursor: pointer;
   flex-shrink: 0; transition: all 150ms;
-  svg { width: 14px; height: 14px; }
-  &:hover { color: $accent; border-color: $accent-border; background: $accent-soft; }
-  &.active { color: $accent; border-color: $accent; background: $accent-soft; }
+  position: relative;
+  svg { width: 16px; height: 16px; }
+  // Each button gets its own color
+  &.ctx-page { color: #3b82f6; &:hover { background: #eff6ff; } &.active { background: #dbeafe; } }
+  &.ctx-tabs { color: #8b5cf6; &:hover { background: #f5f3ff; } &.active { background: #ede9fe; } }
+  &.ctx-attach { color: #f59e0b; &:hover { background: #fffbeb; } &.active { background: #fef3c7; } }
+
+  // Tooltip
+  &::after {
+    content: attr(data-tip);
+    position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+    padding: 4px 8px; background: #1f2937; color: white;
+    font-size: 10px; border-radius: 4px; white-space: nowrap;
+    opacity: 0; pointer-events: none; transition: opacity 150ms;
+    margin-bottom: 4px;
+  }
+  &:hover::after { opacity: 1; }
 }
 
 .chat-input {

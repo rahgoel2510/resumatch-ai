@@ -86,16 +86,16 @@
 
         <div class="input-row">
           <!-- Page context button (single page) -->
-          <button id="pageCtxBtn" class="ctx-btn" title="Include current page">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <button id="pageCtxBtn" class="ctx-btn ctx-page" data-tip="Include this page">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           </button>
           <!-- Multi-tab context button -->
-          <button id="multiTabBtn" class="ctx-btn" title="Include multiple tabs">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          <button id="multiTabBtn" class="ctx-btn ctx-tabs" data-tip="Add multiple tabs">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
           </button>
           <!-- Attach file button -->
-          <button id="attachBtn" class="ctx-btn" title="Attach file">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.49"/></svg>
+          <button id="attachBtn" class="ctx-btn ctx-attach" data-tip="Attach files">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.49"/></svg>
           </button>
           <!-- Text input -->
           <textarea id="chatInput" class="chat-input" placeholder="Ask anything, or type / for commands..." rows="1"></textarea>
@@ -146,7 +146,8 @@
           <section class="s-section">
             <h3 class="s-label">AI Model</h3>
             <select id="settingsModelSelect" class="s-select"></select>
-            <p class="s-hint">Only free models shown. Change anytime.</p>
+            <p class="s-hint">Only free models shown. Pick based on speed vs quality.</p>
+            <div id="modelBrowser" class="model-browser" style="margin-top:10px; max-height:200px; overflow-y:auto;"></div>
           </section>
 
           <!-- Section: API Key -->

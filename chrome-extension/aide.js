@@ -121,6 +121,35 @@ function main() {
     });
     const preferred = state.models.find(m => m.id.includes('llama')) || state.models[0];
     if (preferred) { select.value = preferred.id; state.model = preferred.id; }
+
+    // Render model cards in settings browser
+    renderModelBrowser();
+  }
+
+  function renderModelBrowser() {
+    const browser = document.getElementById('modelBrowser');
+    if (!browser) return;
+    browser.innerHTML = '';
+    state.models.slice(0, 15).forEach(m => {
+      const card = document.createElement('div');
+      card.className = `model-card${m.id === state.model ? ' selected' : ''}`;
+      const ctx = m.context_length ? `${Math.round(m.context_length / 1000)}k ctx` : '';
+      card.innerHTML = `
+        <div class="model-card-info">
+          <div class="model-card-name">${escHtml(m.name || m.id)}</div>
+          <div class="model-card-meta">${ctx}</div>
+        </div>
+        <span class="model-card-badge free">FREE</span>
+      `;
+      card.addEventListener('click', () => {
+        state.model = m.id;
+        dom.modelSelect.value = m.id;
+        dom.settingsModelSelect.value = m.id;
+        browser.querySelectorAll('.model-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+      });
+      browser.appendChild(card);
+    });
   }
 
   async function validateKey(key) {
