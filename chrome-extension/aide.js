@@ -703,8 +703,8 @@ function main() {
     let actions = '';
     if (role === 'ai') {
       actions = `<div class="msg-actions">
-        <button class="msg-action-btn copy-btn" title="Copy">📋 Copy</button>
-        <button class="msg-action-btn regen-btn" title="Regenerate">🔄 Retry</button>
+        <button class="msg-action-btn copy-btn" title="Copy to clipboard"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+        <button class="msg-action-btn regen-btn" title="Regenerate response"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></button>
       </div>`;
     }
 
@@ -722,9 +722,13 @@ function main() {
       div.querySelector('.copy-btn').addEventListener('click', (e) => {
         const content = div.querySelector('.msg-content').innerText;
         navigator.clipboard.writeText(content);
-        e.target.textContent = '✓ Copied';
-        e.target.classList.add('copied');
-        setTimeout(() => { e.target.textContent = '📋 Copy'; e.target.classList.remove('copied'); }, 1500);
+        const btn = e.currentTarget;
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+          btn.classList.remove('copied');
+        }, 1500);
       });
       div.querySelector('.regen-btn').addEventListener('click', () => {
         // Regenerate: remove last assistant msg from memory and resend

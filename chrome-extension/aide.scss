@@ -200,16 +200,16 @@ html, body {
 
 // Message actions
 .msg-actions {
-  display: flex; gap: 4px; margin-top: 8px; opacity: 0;
+  display: flex; gap: 2px; margin-top: 6px; opacity: 0;
   transition: opacity 150ms;
   .message:hover & { opacity: 1; }
 }
 .msg-action-btn {
-  padding: 4px 10px; background: $white; border: 1px solid $border;
-  border-radius: $radius; color: $text-secondary; font-size: 11px;
-  cursor: pointer; display: flex; align-items: center; gap: 4px;
-  &:hover { border-color: $accent-border; color: $accent; background: $accent-soft; }
-  &.copied { color: $success; border-color: $success; }
+  width: 28px; height: 28px; @include flex-center;
+  background: transparent; border: none; border-radius: 6px;
+  color: $text-muted; cursor: pointer;
+  &:hover { background: $bg-hover; color: $text-secondary; }
+  &.copied { color: $success; }
 }
 
 // Typing dots

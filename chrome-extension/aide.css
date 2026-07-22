@@ -446,8 +446,8 @@ html, body {
 
 .msg-actions {
   display: flex;
-  gap: 4px;
-  margin-top: 8px;
+  gap: 2px;
+  margin-top: 6px;
   opacity: 0;
   transition: opacity 150ms;
 }
@@ -456,25 +456,23 @@ html, body {
 }
 
 .msg-action-btn {
-  padding: 4px 10px;
-  background: #ffffff;
-  border: 1px solid #dce6f5;
-  border-radius: 8px;
-  color: #546484;
-  font-size: 11px;
-  cursor: pointer;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #8da0be;
+  cursor: pointer;
 }
 .msg-action-btn:hover {
-  border-color: #bfdbfe;
-  color: #2563eb;
-  background: #eff4ff;
+  background: #e8eeff;
+  color: #546484;
 }
 .msg-action-btn.copied {
   color: #10b981;
-  border-color: #10b981;
 }
 
 .typing-dots {
