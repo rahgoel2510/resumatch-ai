@@ -5,32 +5,32 @@
 
 // ─── VARIABLES ─────────────────────────────────────────────────
 $white: #ffffff;
-$bg-base: #f9fafb;
+$bg-base: #f0f4ff;
 $bg-surface: #ffffff;
-$bg-hover: #f3f4f6;
-$bg-input: #f3f4f6;
-$bg-active: #eef2ff;
+$bg-hover: #e8eeff;
+$bg-input: #f5f8ff;
+$bg-active: #dce6ff;
 
-$text-primary: #1f2937;
-$text-secondary: #6b7280;
-$text-muted: #9ca3af;
+$text-primary: #1a2744;
+$text-secondary: #546484;
+$text-muted: #8da0be;
 
-$accent: #4f46e5;
-$accent-hover: #4338ca;
-$accent-soft: #eef2ff;
-$accent-border: #c7d2fe;
+$accent: #2563eb;
+$accent-hover: #1d4ed8;
+$accent-soft: #eff4ff;
+$accent-border: #bfdbfe;
 
 $success: #10b981;
 $error: #ef4444;
 $warning: #f59e0b;
 
-$border: #e5e7eb;
-$border-light: #f3f4f6;
+$border: #dce6f5;
+$border-light: #edf2fc;
 $radius: 8px;
 $radius-lg: 12px;
 $radius-xl: 16px;
-$shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-$shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+$shadow-sm: 0 1px 3px rgba(37, 99, 235, 0.06);
+$shadow-md: 0 4px 16px rgba(37, 99, 235, 0.1);
 $font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 
 // ─── MIXINS ───────────────────────────────────────────────────
@@ -83,9 +83,11 @@ html, body {
 .error-text { color: $error; font-size: 12px; margin-top: 6px; min-height: 16px; }
 .btn-primary {
   width: 100%; max-width: 340px; padding: 12px;
-  background: $accent; color: white; border: none; border-radius: $radius;
+  background: linear-gradient(135deg, #2563eb, #1e40af); color: white;
+  border: none; border-radius: $radius;
   font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px;
-  &:hover { background: $accent-hover; }
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  &:hover { background: linear-gradient(135deg, #1d4ed8, #1e3a8a); }
 }
 .setup-footer { margin-top: 16px; font-size: 12px; color: $text-muted; }
 
@@ -93,12 +95,12 @@ html, body {
 .topbar {
   @include flex-between;
   padding: 10px 16px;
-  background: $white;
+  background: linear-gradient(180deg, $white, #f7f9ff);
   border-bottom: 1px solid $border;
   flex-shrink: 0;
 }
 .topbar-left { display: flex; align-items: center; gap: 8px; }
-.topbar-title { font-size: 14px; font-weight: 600; color: $text-primary; }
+.topbar-title { font-size: 14px; font-weight: 600; color: $accent; }
 .topbar-right { display: flex; align-items: center; gap: 4px; }
 
 // Smart model comparison panel (opened from settings)
@@ -127,12 +129,13 @@ html, body {
 .llm-status {
   @include flex-center;
   width: 26px; height: 26px; border-radius: 50%;
-  background: #ecfdf5; cursor: default;
+  background: #eff6ff; cursor: default;
   position: relative;
 }
 .llm-dot {
   width: 8px; height: 8px; border-radius: 50%;
-  background: $success;
+  background: $accent;
+  box-shadow: 0 0 6px rgba(37, 99, 235, 0.4);
   transition: all 300ms;
 }
 // When AI is streaming/thinking
@@ -141,8 +144,8 @@ html, body {
   animation: llmPulse 1s infinite;
 }
 @keyframes llmPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.6); opacity: 0.5; }
+  0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 6px rgba(37, 99, 235, 0.4); }
+  50% { transform: scale(1.8); opacity: 0.4; box-shadow: 0 0 12px rgba(37, 99, 235, 0.6); }
 }
 
 // ─── CHAT AREA ────────────────────────────────────────────────
@@ -170,7 +173,7 @@ html, body {
   border: 1px solid $border; border-radius: $radius-lg;
   color: $text-primary; font-size: 13px; text-align: left;
   cursor: pointer; transition: all 150ms; box-shadow: $shadow-sm;
-  &:hover { border-color: $accent-border; background: $accent-soft; box-shadow: $shadow-md; }
+  &:hover { border-color: $accent; background: $accent-soft; box-shadow: $shadow-md; transform: translateY(-1px); }
 }
 
 // Messages
@@ -298,10 +301,12 @@ html, body {
 .send-btn {
   width: 28px; height: 28px; @include flex-center;
   border: none; border-radius: 6px;
-  background: $accent; color: white; cursor: pointer; flex-shrink: 0;
+  background: linear-gradient(135deg, #2563eb, #1e40af); color: white;
+  cursor: pointer; flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
   svg { width: 14px; height: 14px; }
-  &:disabled { opacity: 0.3; cursor: not-allowed; }
-  &:not(:disabled):hover { background: $accent-hover; }
+  &:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
+  &:not(:disabled):hover { background: linear-gradient(135deg, #1d4ed8, #1e3a8a); }
 }
 
 .input-meta {
