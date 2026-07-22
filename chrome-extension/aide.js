@@ -176,6 +176,113 @@ function main() {
   }
 
   // ═══════════════════════════════════════════════════════════════════
+  // CHAT HISTORY (persisted in chrome.storage.local)
+  // ═══════════════════════════════════════════════════════════════════
+
+  /**
+   * Save current session to history.
+   * Called when: user clicks "New Chat", or manually.
+   * Each session: { id, timestamp, model, messages[], preview }
+   */
+  async function saveSessionToHistory() {
+    if (state.sessionMemory.length === 0) return; // nothing to save
+
+    const session = {
+      id: Date.now(),
+      timestamp: Date.now(),
+      model: state.model,
+      messages: state.sessionMemory.slice(), // copy
+      preview: state.sessionMemory.find(m => m.role === 'user')?.content.substring(0, 80) || 'Chat session'
+    };
+
+    const stored = await getHistory();
+    stored.unshift(session);
+    // Keep max 50 sessions
+    if (stored.length > 50) stored.length = 50;
+    await chrome.storage.local.set({ rg_history: stored });
+  }
+
+  function getHistory() {
+    return new Promise(resolve => {
+      chrome.storage.local.get(['rg_history'], (d) => resolve(d.rg_history || []));
+    });
+  }
+
+  async function deleteSession(id) {
+    const stored = await getHistory();
+    const filtered = stored.filter(s => s.id !== id);
+    await chrome.storage.local.set({ rg_history: filtered });
+    renderHistoryPanel();
+  }
+
+  async function loadSession(id) {
+    const stored = await getHistory();
+    const session = stored.find(s => s.id === id);
+    if (!session) return;
+
+    // Load into current chat
+    state.sessionMemory = session.messages.slice();
+    dom.welcomeState.style.display = 'none';
+    dom.chatMessages.style.display = 'flex';
+    dom.chatMessages.innerHTML = '';
+
+    // Render all messages
+    session.messages.forEach(msg => {
+      renderMessage(msg.role === 'assistant' ? 'ai' : 'user', msg.content);
+    });
+
+    updateMemoryBadge();
+    closeHistory();
+  }
+
+  function openHistory() {
+    document.getElementById('historyPanel').classList.add('open');
+    renderHistoryPanel();
+  }
+
+  function closeHistory() {
+    document.getElementById('historyPanel').classList.remove('open');
+  }
+
+  async function renderHistoryPanel() {
+    const list = document.getElementById('historyList');
+    const empty = document.getElementById('historyEmpty');
+    const stored = await getHistory();
+
+    if (stored.length === 0) {
+      list.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+
+    empty.style.display = 'none';
+    list.innerHTML = stored.map(s => {
+      const date = new Date(s.timestamp);
+      const timeStr = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' +
+                      date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+      const msgCount = s.messages.length;
+      return `
+        <div class="history-item" data-id="${s.id}">
+          <div class="history-item-content">
+            <div class="history-item-preview">${escHtml(s.preview)}</div>
+            <div class="history-item-meta">${timeStr} · ${msgCount} messages</div>
+          </div>
+          <button class="history-item-delete" data-id="${s.id}" title="Delete">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+          </button>
+        </div>`;
+    }).join('');
+
+    // Bind click events
+    list.querySelectorAll('.history-item-content').forEach(el => {
+      el.addEventListener('click', () => loadSession(+el.parentElement.dataset.id));
+    });
+    list.querySelectorAll('.history-item-delete').forEach(el => {
+      el.addEventListener('click', (e) => { e.stopPropagation(); deleteSession(+el.dataset.id); });
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
   // PAGE CONTEXT (reads current tab)
   // ═══════════════════════════════════════════════════════════════════
   async function grabPageContext() {
@@ -631,6 +738,9 @@ function main() {
   }
 
   function clearChat() {
+    // Save current session before clearing
+    saveSessionToHistory();
+
     state.sessionMemory = [];
     state.pageContext = '';
     state.pageContextActive = false;
@@ -707,6 +817,11 @@ function main() {
   dom.settingsBtn.addEventListener('click', openSettings);
   dom.settingsCloseBtn.addEventListener('click', closeSettings);
   dom.settingsBackdrop.addEventListener('click', closeSettings);
+
+  // History
+  document.getElementById('historyBtn').addEventListener('click', openHistory);
+  document.getElementById('historyCloseBtn').addEventListener('click', closeHistory);
+  document.getElementById('historyBackdrop').addEventListener('click', closeHistory);
   dom.settingsKeySave.addEventListener('click', async () => {
     const key = dom.settingsKeyInput.value.trim();
     if (!key) { dom.settingsKeyStatus.textContent = '⚠️ Enter a key'; dom.settingsKeyStatus.className = 's-status err'; return; }

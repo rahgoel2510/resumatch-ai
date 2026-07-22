@@ -370,3 +370,23 @@ html, body {
 
 // ─── UTILITIES ────────────────────────────────────────────────
 .hidden { display: none !important; }
+
+// ─── HISTORY ITEMS ────────────────────────────────────────────
+.history-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border: 1px solid $border; border-radius: $radius;
+  cursor: pointer; transition: all 150ms;
+  &:hover { border-color: $accent-border; background: $accent-soft; }
+}
+.history-item-content { flex: 1; min-width: 0; }
+.history-item-preview {
+  font-size: 13px; font-weight: 500; color: $text-primary;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.history-item-meta { font-size: 11px; color: $text-muted; margin-top: 2px; }
+.history-item-delete {
+  width: 28px; height: 28px; @include flex-center;
+  border: none; border-radius: 6px; background: transparent;
+  color: $text-muted; cursor: pointer; flex-shrink: 0;
+  &:hover { background: #fee2e2; color: $error; }
+}
