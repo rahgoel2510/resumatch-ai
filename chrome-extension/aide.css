@@ -183,29 +183,7 @@ html, body {
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-.model-select {
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  color: #1f2937;
-  font-size: 12px;
-  padding: 5px 24px 5px 8px;
-  outline: none;
-  max-width: 160px;
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-}
-.model-select:focus {
-  border-color: #4f46e5;
-}
-.model-select option {
-  padding: 8px;
+  gap: 4px;
 }
 
 .model-card {
@@ -276,6 +254,41 @@ html, body {
   color: #1f2937;
 }
 
+.llm-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ecfdf5;
+  cursor: default;
+  position: relative;
+}
+
+.llm-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  transition: all 300ms;
+}
+
+.llm-status.thinking .llm-dot {
+  background: #4f46e5;
+  animation: llmPulse 1s infinite;
+}
+
+@keyframes llmPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0.5;
+  }
+}
 .chat-area {
   flex: 1;
   overflow-y: auto;

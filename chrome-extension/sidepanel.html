@@ -45,7 +45,10 @@
           <span class="topbar-title">RG Aide</span>
         </div>
         <div class="topbar-right">
-          <select id="modelSelect" class="model-select" title="AI Model"></select>
+          <!-- Smart LLM status indicator (replaces model dropdown) -->
+          <div id="llmStatus" class="llm-status" title="AI Ready">
+            <div class="llm-dot"></div>
+          </div>
           <button id="newChatBtn" class="icon-btn" title="New conversation">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
@@ -235,6 +238,7 @@
   </div>
 
   <input type="file" id="fileInput" style="display:none" multiple accept=".txt,.pdf,.md,.csv,.json,.html">
+  <select id="modelSelect" style="display:none"></select>
   <script src="aide.js"></script>
 </body>
 </html>

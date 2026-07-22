@@ -548,6 +548,10 @@ function main() {
     if (!userText.trim() || state.isStreaming) return;
     state.isStreaming = true;
 
+    // Show LLM thinking animation
+    const llmStatus = document.getElementById('llmStatus');
+    if (llmStatus) { llmStatus.classList.add('thinking'); llmStatus.title = 'AI Thinking...'; }
+
     // Hide welcome, show messages
     dom.welcomeState.style.display = 'none';
     dom.chatMessages.style.display = 'flex';
@@ -632,6 +636,9 @@ function main() {
       renderMessage('ai', `❌ **Error:** ${err.message}`);
     } finally {
       state.isStreaming = false;
+      // Stop LLM thinking animation
+      const llmStatus = document.getElementById('llmStatus');
+      if (llmStatus) { llmStatus.classList.remove('thinking'); llmStatus.title = 'AI Ready'; }
       // Reset page context after use (unless auto-ctx is on)
       if (!state.settings.autoCtx) {
         state.pageContextActive = false;
