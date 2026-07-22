@@ -40,7 +40,7 @@ function main() {
     pageContext: '',       // Current page text (when user clicks page btn)
     pageContextActive: false,
     attachments: [],      // {name, content}[] — file text
-    settings: { sessionMem: true, autoCtx: false, compact: false }
+    settings: { sessionMem: true, autoCtx: false, compact: false, userName: '', appName: '' }
   };
   window.__state = state;
 
@@ -165,14 +165,45 @@ function main() {
     dom.settingsSessionMem.checked = state.settings.sessionMem;
     dom.settingsAutoCtx.checked = state.settings.autoCtx;
     dom.settingsCompact.checked = state.settings.compact;
+    document.getElementById('settingsUserName').value = state.settings.userName || '';
+    document.getElementById('settingsAppName').value = state.settings.appName || '';
     dom.settingsPanel.classList.add('open');
   }
   function closeSettings() {
     state.settings.sessionMem = dom.settingsSessionMem.checked;
     state.settings.autoCtx = dom.settingsAutoCtx.checked;
     state.settings.compact = dom.settingsCompact.checked;
+    state.settings.userName = document.getElementById('settingsUserName').value.trim();
+    state.settings.appName = document.getElementById('settingsAppName').value.trim();
     saveSettings();
+    applyPersonalization();
     dom.settingsPanel.classList.remove('open');
+  }
+
+  /**
+   * Apply user's custom name and app name to the UI.
+   * Updates: topbar title, welcome screen title, document title, about section.
+   */
+  function applyPersonalization() {
+    const appName = state.settings.appName || 'RG Aide';
+    const userName = state.settings.userName || '';
+
+    // Topbar title
+    const topTitle = document.querySelector('.topbar-title');
+    if (topTitle) topTitle.textContent = appName;
+
+    // Welcome title
+    const welcomeTitle = document.querySelector('.welcome-title');
+    if (welcomeTitle) {
+      welcomeTitle.textContent = userName ? `Hi ${userName}! Let's go.` : 'All set. Let\'s go.';
+    }
+
+    // Document title
+    document.title = appName;
+
+    // About section
+    const aboutEl = document.getElementById('aboutAppName');
+    if (aboutEl) aboutEl.textContent = `${appName} v1.0.0`;
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -861,6 +892,7 @@ function main() {
     const saved = await loadKey();
     if (saved) { state.apiKey = saved; showChatScreen(); fetchModels(); }
     else { showSetupScreen(); }
+    applyPersonalization();
   }
   boot();
 
