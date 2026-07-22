@@ -80,13 +80,19 @@
 
       <!-- Input Area -->
       <footer class="input-area">
+        <!-- Context sources bar (shows what's attached) -->
+        <div id="contextBar" class="context-bar"></div>
         <!-- Attachment bar -->
         <div id="attachBar" class="attach-bar"></div>
 
         <div class="input-row">
-          <!-- Page context button -->
-          <button id="pageCtxBtn" class="ctx-btn" title="Include current page as context">
+          <!-- Page context button (single page) -->
+          <button id="pageCtxBtn" class="ctx-btn" title="Include current page">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </button>
+          <!-- Multi-tab context button -->
+          <button id="multiTabBtn" class="ctx-btn" title="Include multiple tabs">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
           </button>
           <!-- Attach file button -->
           <button id="attachBtn" class="ctx-btn" title="Attach file">
@@ -105,6 +111,21 @@
           <span class="input-hint">Enter to send • Shift+Enter new line • /help for commands</span>
         </div>
       </footer>
+
+      <!-- Multi-Tab Picker (overlay) -->
+      <div id="tabPicker" class="tab-picker">
+        <div class="tab-picker-header">
+          <h3>Select tabs to include as context</h3>
+          <button id="tabPickerClose" class="icon-btn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div id="tabPickerList" class="tab-picker-list"></div>
+        <div class="tab-picker-footer">
+          <span id="tabPickerCount">0 selected</span>
+          <button id="tabPickerConfirm" class="s-btn" disabled>Add Context</button>
+        </div>
+      </div>
 
     </div>
 

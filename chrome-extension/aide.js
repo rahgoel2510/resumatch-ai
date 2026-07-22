@@ -153,36 +153,59 @@ function main() {
     try {
       const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
       if (!tab || !tab.id) { console.warn('[RG Aide] No active tab found'); return ''; }
-
-      // Can't inject into chrome:// or extension pages
       if (tab.url && (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://'))) {
         console.warn('[RG Aide] Cannot read chrome:// pages');
         return '';
       }
-
       const results = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         func: () => {
-          // Try to get the most meaningful content
           const selectors = ['article', 'main', '[role="main"]', '.content', '#content'];
           for (const sel of selectors) {
             const el = document.querySelector(sel);
-            if (el && el.innerText.trim().length > 100) {
-              return el.innerText.trim().substring(0, 6000);
-            }
+            if (el && el.innerText.trim().length > 100) return el.innerText.trim().substring(0, 6000);
           }
-          // Fallback: body text (skip scripts/styles)
           return document.body.innerText.substring(0, 6000);
         }
       });
-
       const text = results?.[0]?.result || '';
       console.log(`[RG Aide] Grabbed ${text.length} chars from page`);
       return text;
-    } catch (err) {
-      console.error('[RG Aide] Failed to grab page context:', err);
-      return '';
-    }
+    } catch (err) { console.error('[RG Aide] Page context error:', err); return ''; }
+  }
+
+  /** Grab content from a specific tab by ID */
+  async function grabTabContent(tabId) {
+    try {
+      const results = await chrome.scripting.executeScript({
+        target: { tabId },
+        func: () => {
+          const selectors = ['article', 'main', '[role="main"]', '.content', '#content'];
+          for (const sel of selectors) {
+            const el = document.querySelector(sel);
+            if (el && el.innerText.trim().length > 100) return el.innerText.trim().substring(0, 4000);
+          }
+          return document.body.innerText.substring(0, 4000);
+        }
+      });
+      return results?.[0]?.result || '';
+    } catch { return ''; }
+  }
+
+  // Context sources: [{type: 'page'|'tab', title, content}]
+  let contextSources = [];
+
+  function renderContextBar() {
+    const bar = dom.contextBar;
+    bar.innerHTML = contextSources.map((src, i) =>
+      `<div class="context-chip">
+        <span class="chip-text">${src.type === 'page' ? '📄' : '🗂️'} ${escHtml(src.title)}</span>
+        <span class="chip-remove" data-idx="${i}">✕</span>
+      </div>`
+    ).join('');
+    bar.querySelectorAll('.chip-remove').forEach(el => {
+      el.addEventListener('click', () => { contextSources.splice(+el.dataset.idx, 1); renderContextBar(); });
+    });
   }
 
   async function togglePageContext() {
@@ -190,14 +213,91 @@ function main() {
       state.pageContextActive = false;
       state.pageContext = '';
       dom.pageCtxBtn.classList.remove('active');
+      // Remove page source from contextSources
+      contextSources = contextSources.filter(s => s.type !== 'page');
+      renderContextBar();
     } else {
       dom.pageCtxBtn.classList.add('active');
-      state.pageContext = await grabPageContext();
-      state.pageContextActive = !!state.pageContext;
-      if (!state.pageContext) {
+      const text = await grabPageContext();
+      if (text) {
+        state.pageContext = text;
+        state.pageContextActive = true;
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        contextSources.push({ type: 'page', title: tab?.title || 'Current page', content: text });
+        renderContextBar();
+      } else {
         dom.pageCtxBtn.classList.remove('active');
       }
     }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // MULTI-TAB CONTEXT PICKER
+  // ═══════════════════════════════════════════════════════════════════
+  const tabPickerDom = {
+    picker: document.getElementById('tabPicker'),
+    list: document.getElementById('tabPickerList'),
+    close: document.getElementById('tabPickerClose'),
+    confirm: document.getElementById('tabPickerConfirm'),
+    count: document.getElementById('tabPickerCount'),
+    btn: document.getElementById('multiTabBtn'),
+    contextBar: document.getElementById('contextBar'),
+  };
+  // Also add contextBar to dom
+  dom.contextBar = document.getElementById('contextBar');
+
+  async function openTabPicker() {
+    tabPickerDom.picker.classList.add('open');
+    tabPickerDom.list.innerHTML = '<div style="padding:12px;color:var(--text-muted)">Loading tabs...</div>';
+
+    const tabs = await chrome.tabs.query({ currentWindow: true });
+    tabPickerDom.list.innerHTML = '';
+
+    tabs.forEach(tab => {
+      // Skip chrome:// pages
+      if (tab.url && (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://'))) return;
+
+      const item = document.createElement('div');
+      item.className = 'tab-picker-item';
+      item.innerHTML = `
+        <input type="checkbox" data-tab-id="${tab.id}" data-tab-title="${escHtml(tab.title || '')}">
+        <div>
+          <div class="tab-picker-title">${escHtml(tab.title || 'Untitled')}</div>
+          <div class="tab-picker-url">${escHtml(tab.url || '')}</div>
+        </div>
+      `;
+      item.addEventListener('click', (e) => {
+        if (e.target.type !== 'checkbox') {
+          const cb = item.querySelector('input[type="checkbox"]');
+          cb.checked = !cb.checked;
+        }
+        updateTabPickerCount();
+      });
+      tabPickerDom.list.appendChild(item);
+    });
+  }
+
+  function updateTabPickerCount() {
+    const checked = tabPickerDom.list.querySelectorAll('input:checked');
+    const n = checked.length;
+    tabPickerDom.count.textContent = `${n} selected`;
+    tabPickerDom.confirm.disabled = n === 0;
+  }
+
+  async function confirmTabPicker() {
+    const checked = tabPickerDom.list.querySelectorAll('input:checked');
+    tabPickerDom.picker.classList.remove('open');
+
+    for (const cb of checked) {
+      const tabId = parseInt(cb.dataset.tabId);
+      const title = cb.dataset.tabTitle || 'Tab';
+      const content = await grabTabContent(tabId);
+      if (content) {
+        contextSources.push({ type: 'tab', title, content });
+      }
+    }
+    renderContextBar();
+    tabPickerDom.btn.classList.toggle('active', contextSources.some(s => s.type === 'tab'));
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -277,21 +377,26 @@ function main() {
       state.pageContext = await grabPageContext();
     }
 
-    // Render user message (show only what user typed)
-    renderMessage('user', userText.trim(), { hasContext: state.pageContextActive && !!state.pageContext });
+    // Render user message
+    const hasCtx = contextSources.length > 0 || (state.attachments.length > 0);
+    renderMessage('user', userText.trim(), { hasContext: hasCtx });
 
     // Build messages array for API
-    // We inject a system message with page context so the AI KNOWS it has the content
     const messagesForApi = [];
 
-    if (state.pageContextActive && state.pageContext) {
+    // Inject ALL context sources as system message
+    if (contextSources.length > 0) {
+      const combined = contextSources.map((src, i) =>
+        `--- SOURCE ${i + 1}: ${src.title} ---\n${src.content}\n--- END SOURCE ${i + 1} ---`
+      ).join('\n\n');
+
       messagesForApi.push({
         role: 'system',
-        content: `You are a helpful assistant. The user is viewing a web page. Here is the full text content of that page:\n\n---PAGE START---\n${state.pageContext}\n---PAGE END---\n\nUse this page content to answer the user's questions. Always reference the page content directly. Do not ask the user to paste or share the page — you already have it.`
+        content: `You are a helpful assistant. The user has provided the following web page content(s) as context:\n\n${combined}\n\nUse this content to answer the user's questions directly. Do NOT ask the user to paste or share the content — you already have it. Reference specific parts when relevant.`
       });
     }
 
-    // Add attachments as system context too
+    // Add attachments as system context
     if (state.attachments.length) {
       const attached = state.attachments.map(a => `[FILE: ${a.name}]\n${a.content}`).join('\n\n');
       messagesForApi.push({
@@ -482,11 +587,14 @@ function main() {
     state.pageContext = '';
     state.pageContextActive = false;
     state.attachments = [];
+    contextSources = [];
     dom.pageCtxBtn.classList.remove('active');
+    tabPickerDom.btn.classList.remove('active');
     dom.chatMessages.innerHTML = '';
     dom.chatMessages.style.display = 'none';
     dom.welcomeState.style.display = '';
     renderAttachBar();
+    renderContextBar();
     updateMemoryBadge();
   }
 
@@ -534,6 +642,11 @@ function main() {
 
   // Page context
   dom.pageCtxBtn.addEventListener('click', togglePageContext);
+
+  // Multi-tab picker
+  tabPickerDom.btn.addEventListener('click', openTabPicker);
+  tabPickerDom.close.addEventListener('click', () => tabPickerDom.picker.classList.remove('open'));
+  tabPickerDom.confirm.addEventListener('click', confirmTabPicker);
 
   // Attachments
   dom.attachBtn.addEventListener('click', () => dom.fileInput.click());
