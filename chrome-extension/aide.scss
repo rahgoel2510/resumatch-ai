@@ -1,31 +1,37 @@
 // ═══════════════════════════════════════════════════════════════
-// RG Aide — Stylesheet (SCSS)
+// RG Aide — Light Theme (Amazon Q Business inspired)
 // Copyright (c) 2026 Rahul Goel. MIT License.
 // ═══════════════════════════════════════════════════════════════
 
 // ─── VARIABLES ─────────────────────────────────────────────────
-$bg-base: #1a1a2e;
-$bg-surface: #16213e;
-$bg-elevated: #1e2a4a;
-$bg-input: #0d1b3e;
-$bg-hover: #243b6e;
+$white: #ffffff;
+$bg-base: #f9fafb;
+$bg-surface: #ffffff;
+$bg-hover: #f3f4f6;
+$bg-input: #f3f4f6;
+$bg-active: #eef2ff;
 
-$text-primary: #e8eaf6;
-$text-secondary: #9fa8c7;
-$text-muted: #6b7394;
+$text-primary: #1f2937;
+$text-secondary: #6b7280;
+$text-muted: #9ca3af;
 
-$accent: #5b7cfa;
-$accent-hover: #7b96ff;
-$accent-soft: rgba(91, 124, 250, 0.12);
-$success: #4caf50;
-$error: #ef5350;
-$warning: #ff9800;
+$accent: #4f46e5;
+$accent-hover: #4338ca;
+$accent-soft: #eef2ff;
+$accent-border: #c7d2fe;
 
-$border: rgba(255, 255, 255, 0.08);
-$border-light: rgba(255, 255, 255, 0.12);
+$success: #10b981;
+$error: #ef4444;
+$warning: #f59e0b;
+
+$border: #e5e7eb;
+$border-light: #f3f4f6;
 $radius: 8px;
 $radius-lg: 12px;
-$font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$radius-xl: 16px;
+$shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+$shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+$font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 
 // ─── MIXINS ───────────────────────────────────────────────────
 @mixin flex-center { display: flex; align-items: center; justify-content: center; }
@@ -37,7 +43,7 @@ $font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 html, body {
   height: 100%;
   font-family: $font;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.5;
   color: $text-primary;
   background: $bg-base;
@@ -48,334 +54,283 @@ html, body {
 #app { height: 100vh; display: flex; flex-direction: column; }
 .screen { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
 
 // ─── SETUP SCREEN ─────────────────────────────────────────────
 .setup-container {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  padding: 24px; text-align: center;
+  padding: 32px 24px; text-align: center; background: $white;
 }
-.setup-logo { margin-bottom: 16px; img { border-radius: $radius-lg; box-shadow: 0 4px 20px rgba($accent, 0.2); } }
-.setup-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
-.setup-subtitle { color: $text-secondary; margin-bottom: 24px; font-size: 13px; }
+.setup-logo { margin-bottom: 16px; img { border-radius: $radius-lg; box-shadow: $shadow-md; } }
+.setup-title { font-size: 24px; font-weight: 700; color: $text-primary; margin-bottom: 4px; }
+.setup-subtitle { color: $text-secondary; margin-bottom: 28px; font-size: 14px; }
 .setup-card {
-  width: 100%; max-width: 320px;
-  background: $bg-surface; border: 1px solid $border;
-  border-radius: $radius; padding: 14px; margin-bottom: 12px; text-align: left;
-  input { width: 100%; padding: 9px 12px; background: $bg-input; border: 1px solid $border; border-radius: $radius; color: $text-primary; font-size: 13px; font-family: monospace; outline: none; &:focus { border-color: $accent; } }
+  width: 100%; max-width: 340px;
+  background: $bg-base; border: 1px solid $border;
+  border-radius: $radius-lg; padding: 16px; margin-bottom: 12px; text-align: left;
+  input {
+    width: 100%; padding: 10px 14px; background: $white;
+    border: 1px solid $border; border-radius: $radius;
+    color: $text-primary; font-size: 14px; font-family: monospace; outline: none;
+    &:focus { border-color: $accent; box-shadow: 0 0 0 3px $accent-soft; }
+  }
 }
-.setup-step { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-weight: 500; font-size: 12.5px; }
-.step-num { width: 22px; height: 22px; @include flex-center; background: $accent; color: white; border-radius: 50%; font-size: 11px; font-weight: 700; }
-.setup-link { display: block; color: $accent; font-size: 12px; text-decoration: none; &:hover { text-decoration: underline; } }
-.error-text { color: $error; font-size: 11px; margin-top: 6px; min-height: 16px; }
-.btn-primary { width: 100%; max-width: 320px; padding: 12px; background: $accent; color: white; border: none; border-radius: $radius; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; &:hover { background: $accent-hover; } }
-.setup-footer { margin-top: 16px; font-size: 11px; color: $text-muted; }
+.setup-step { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-weight: 500; font-size: 13px; color: $text-primary; }
+.step-num { width: 24px; height: 24px; @include flex-center; background: $accent; color: white; border-radius: 50%; font-size: 12px; font-weight: 700; }
+.setup-link { display: block; color: $accent; font-size: 13px; text-decoration: none; &:hover { text-decoration: underline; } }
+.error-text { color: $error; font-size: 12px; margin-top: 6px; min-height: 16px; }
+.btn-primary {
+  width: 100%; max-width: 340px; padding: 12px;
+  background: $accent; color: white; border: none; border-radius: $radius;
+  font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px;
+  &:hover { background: $accent-hover; }
+}
+.setup-footer { margin-top: 16px; font-size: 12px; color: $text-muted; }
 
 // ─── TOPBAR ───────────────────────────────────────────────────
 .topbar {
   @include flex-between;
-  padding: 8px 12px;
-  background: $bg-surface;
+  padding: 10px 16px;
+  background: $white;
   border-bottom: 1px solid $border;
   flex-shrink: 0;
 }
 .topbar-left { display: flex; align-items: center; gap: 8px; }
-.topbar-title { font-size: 13px; font-weight: 600; }
+.topbar-title { font-size: 14px; font-weight: 600; color: $text-primary; }
 .topbar-right { display: flex; align-items: center; gap: 6px; }
 .model-select {
   background: $bg-input; border: 1px solid $border; border-radius: $radius;
-  color: $text-primary; font-size: 11px; padding: 4px 6px; outline: none;
-  max-width: 150px; cursor: pointer;
+  color: $text-primary; font-size: 12px; padding: 5px 8px; outline: none;
+  max-width: 160px; cursor: pointer;
   &:focus { border-color: $accent; }
 }
 .icon-btn {
-  width: 28px; height: 28px; @include flex-center;
-  border: none; border-radius: 6px; background: transparent;
+  width: 30px; height: 30px; @include flex-center;
+  border: none; border-radius: $radius; background: transparent;
   color: $text-secondary; cursor: pointer;
-  &:hover { background: $bg-elevated; color: $text-primary; }
+  &:hover { background: $bg-hover; color: $text-primary; }
 }
 
 // ─── CHAT AREA ────────────────────────────────────────────────
 .chat-area {
-  flex: 1; overflow-y: auto; padding: 16px 12px;
-  display: flex; flex-direction: column;
+  flex: 1; overflow-y: auto; padding: 20px 16px;
+  display: flex; flex-direction: column; background: $bg-base;
 }
 
-// Welcome state
+// Welcome
 .welcome-state {
   flex: 1; display: flex; flex-direction: column;
   align-items: center; justify-content: center; text-align: center;
-  padding: 20px 0;
 }
-.welcome-icon { font-size: 36px; margin-bottom: 12px; }
-.welcome-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
-.welcome-desc { font-size: 12.5px; color: $text-secondary; max-width: 260px; margin-bottom: 20px; }
+.welcome-icon { font-size: 40px; margin-bottom: 14px; }
+.welcome-title { font-size: 20px; font-weight: 600; color: $text-primary; margin-bottom: 8px; }
+.welcome-desc { font-size: 13px; color: $text-secondary; max-width: 280px; margin-bottom: 24px; line-height: 1.6; }
 
-// Suggested prompt chips (Amazon Q style)
+// Suggested prompt chips (Amazon Q card style)
 .prompt-chips {
-  display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 320px;
+  display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 320px;
 }
 .chip {
-  padding: 8px 14px;
-  background: $bg-surface; border: 1px solid $border;
-  border-radius: 20px; color: $text-secondary;
-  font-size: 12px; cursor: pointer;
-  transition: all 150ms;
-  &:hover { background: $accent-soft; border-color: $accent; color: $text-primary; }
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; background: $white;
+  border: 1px solid $border; border-radius: $radius-lg;
+  color: $text-primary; font-size: 13px; text-align: left;
+  cursor: pointer; transition: all 150ms; box-shadow: $shadow-sm;
+  &:hover { border-color: $accent-border; background: $accent-soft; box-shadow: $shadow-md; }
 }
 
-// Chat messages
-.chat-messages {
-  display: flex; flex-direction: column; gap: 16px;
-}
+// Messages
+.chat-messages { display: flex; flex-direction: column; gap: 20px; }
 
-.message {
-  display: flex; gap: 10px;
-  animation: fadeIn 0.2s ease;
-}
+.message { display: flex; gap: 12px; animation: fadeIn 0.2s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; } }
 
 .msg-avatar {
-  width: 26px; height: 26px; border-radius: 50%;
-  @include flex-center; font-size: 12px; flex-shrink: 0;
+  width: 28px; height: 28px; border-radius: 50%;
+  @include flex-center; font-size: 13px; flex-shrink: 0;
   &.user { background: $accent; color: white; }
-  &.ai { background: $bg-elevated; border: 1px solid $border; }
+  &.ai { background: $bg-hover; border: 1px solid $border; }
 }
-
 .msg-body { flex: 1; min-width: 0; }
-
 .msg-content {
-  font-size: 13px; line-height: 1.6; word-wrap: break-word;
-  .message.user & { background: $bg-elevated; border: 1px solid $border; border-radius: $radius; padding: 8px 12px; }
+  font-size: 14px; line-height: 1.7; word-wrap: break-word; color: $text-primary;
+  .message.user & { background: $white; border: 1px solid $border; border-radius: $radius-lg; padding: 10px 14px; }
   .message.ai & { padding: 4px 0; }
-  code { background: $bg-input; padding: 1px 5px; border-radius: 4px; font-size: 12px; font-family: monospace; }
-  pre { background: $bg-input; border: 1px solid $border; border-radius: $radius; padding: 10px; margin: 8px 0; overflow-x: auto; font-size: 12px; font-family: monospace; }
-  strong { color: $text-primary; }
+  code { background: $bg-input; padding: 2px 6px; border-radius: 4px; font-size: 12.5px; font-family: monospace; color: $accent; }
+  pre { background: #1f2937; color: #e5e7eb; border-radius: $radius; padding: 12px; margin: 10px 0; overflow-x: auto; font-size: 12.5px; font-family: monospace; }
+  strong { color: $text-primary; font-weight: 600; }
 }
 
-// Message action buttons (copy, regenerate)
+// Message actions
 .msg-actions {
-  display: flex; gap: 4px; margin-top: 6px; opacity: 0;
+  display: flex; gap: 4px; margin-top: 8px; opacity: 0;
   transition: opacity 150ms;
   .message:hover & { opacity: 1; }
 }
 .msg-action-btn {
-  padding: 3px 8px; background: $bg-elevated; border: 1px solid $border;
-  border-radius: 4px; color: $text-muted; font-size: 10.5px;
-  cursor: pointer; display: flex; align-items: center; gap: 3px;
-  &:hover { color: $text-primary; border-color: $border-light; }
+  padding: 4px 10px; background: $white; border: 1px solid $border;
+  border-radius: $radius; color: $text-secondary; font-size: 11px;
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+  &:hover { border-color: $accent-border; color: $accent; background: $accent-soft; }
   &.copied { color: $success; border-color: $success; }
 }
 
-// Typing indicator
+// Typing dots
 .typing-dots { display: flex; gap: 4px; padding: 8px 0; }
 .typing-dots span {
-  width: 6px; height: 6px; border-radius: 50%; background: $text-muted;
+  width: 7px; height: 7px; border-radius: 50%; background: #d1d5db;
   animation: bounce 1s infinite;
   &:nth-child(2) { animation-delay: 0.15s; }
   &:nth-child(3) { animation-delay: 0.3s; }
 }
 @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
 
-// Page context badge on messages
+// Context badge on user messages
 .msg-context-badge {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 2px 8px; background: $accent-soft; border-radius: 4px;
-  font-size: 10px; color: $accent; margin-bottom: 6px;
+  font-size: 11px; color: $accent; margin-bottom: 6px; font-weight: 500;
   svg { width: 10px; height: 10px; }
 }
 
 // ─── INPUT AREA ───────────────────────────────────────────────
 .input-area {
-  flex-shrink: 0; padding: 10px 12px 8px;
-  background: $bg-surface; border-top: 1px solid $border;
+  flex-shrink: 0; padding: 12px 16px;
+  background: $white; border-top: 1px solid $border;
 }
 
+// Context bar (shows attached page/tab chips)
+.context-bar {
+  display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 8px;
+  &:empty { display: none; }
+}
+.context-chip {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px 10px; background: $accent-soft; border: 1px solid $accent-border;
+  border-radius: 20px; font-size: 11px; color: $accent; font-weight: 500;
+  max-width: 180px;
+  .chip-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chip-remove { cursor: pointer; opacity: 0.6; font-size: 13px; &:hover { opacity: 1; } }
+}
+
+// Attach bar
 .attach-bar {
   display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 6px;
   &:empty { display: none; }
 }
 .attach-chip {
   display: flex; align-items: center; gap: 4px;
-  padding: 3px 8px; background: $bg-elevated; border: 1px solid $border;
-  border-radius: 4px; font-size: 11px; color: $text-secondary;
+  padding: 4px 10px; background: $bg-hover; border: 1px solid $border;
+  border-radius: 20px; font-size: 11px; color: $text-secondary;
   .remove-chip { cursor: pointer; color: $text-muted; &:hover { color: $error; } }
 }
 
-.input-row { display: flex; align-items: flex-end; gap: 6px; }
+.input-row { display: flex; align-items: flex-end; gap: 8px; }
 
 .ctx-btn {
-  width: 30px; height: 30px; @include flex-center;
-  border: 1px solid $border; border-radius: 6px;
-  background: transparent; color: $text-muted; cursor: pointer;
+  width: 32px; height: 32px; @include flex-center;
+  border: 1px solid $border; border-radius: $radius;
+  background: $white; color: $text-muted; cursor: pointer;
   flex-shrink: 0; transition: all 150ms;
-  &:hover { color: $accent; border-color: $accent; background: $accent-soft; }
+  &:hover { color: $accent; border-color: $accent-border; background: $accent-soft; }
   &.active { color: $accent; border-color: $accent; background: $accent-soft; }
 }
 
 .chat-input {
-  flex: 1; min-height: 34px; max-height: 100px;
-  padding: 7px 12px; background: $bg-input; border: 1px solid $border;
-  border-radius: $radius; color: $text-primary;
-  font-size: 13px; font-family: $font; line-height: 1.4;
+  flex: 1; min-height: 38px; max-height: 100px;
+  padding: 9px 14px; background: $bg-input; border: 1px solid $border;
+  border-radius: $radius-lg; color: $text-primary;
+  font-size: 14px; font-family: $font; line-height: 1.4;
   resize: none; outline: none;
-  &:focus { border-color: $accent; }
+  &:focus { border-color: $accent; background: $white; box-shadow: 0 0 0 3px $accent-soft; }
   &::placeholder { color: $text-muted; }
 }
 
 .send-btn {
-  width: 30px; height: 30px; @include flex-center;
-  border: none; border-radius: 6px;
+  width: 32px; height: 32px; @include flex-center;
+  border: none; border-radius: $radius;
   background: $accent; color: white; cursor: pointer; flex-shrink: 0;
   &:disabled { opacity: 0.3; cursor: not-allowed; }
   &:not(:disabled):hover { background: $accent-hover; }
 }
 
 .input-meta {
-  @include flex-between;
-  margin-top: 5px; padding: 0 2px;
+  @include flex-between; margin-top: 6px; padding: 0 2px;
 }
-.memory-badge { font-size: 10.5px; color: $text-muted; }
-.input-hint { font-size: 10px; color: $text-muted; }
-
-// ─── SETTINGS PANEL (professional slide-over) ─────────────────
-.settings-panel {
-  position: fixed; inset: 0; z-index: 100;
-  display: none;
-  &.open { display: block; }
-}
-
-.settings-backdrop {
-  position: absolute; inset: 0;
-  background: rgba(0,0,0,0.5); backdrop-filter: blur(2px);
-}
-
-.settings-drawer {
-  position: absolute; top: 0; right: 0; bottom: 0; width: 290px;
-  background: $bg-surface; border-left: 1px solid $border;
-  display: flex; flex-direction: column;
-  animation: slideIn 0.25s ease;
-}
-@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-.settings-header {
-  @include flex-between;
-  padding: 14px 16px; border-bottom: 1px solid $border;
-  h2 { font-size: 15px; font-weight: 600; }
-}
-
-.settings-body {
-  flex: 1; overflow-y: auto; padding: 16px;
-}
-
-.s-section {
-  margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid $border;
-  &:last-child { border-bottom: none; }
-}
-
-.s-label {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.6px; color: $text-muted; margin-bottom: 10px;
-}
-
-.s-select, .s-input {
-  width: 100%; padding: 8px 10px;
-  background: $bg-input; border: 1px solid $border; border-radius: $radius;
-  color: $text-primary; font-size: 12px; outline: none;
-  &:focus { border-color: $accent; }
-}
-.s-select { cursor: pointer; }
-
-.s-key-row { display: flex; gap: 8px; }
-.s-key-row .s-input { flex: 1; font-family: monospace; }
-
-.s-btn {
-  padding: 8px 14px; background: $accent; color: white;
-  border: none; border-radius: $radius; font-size: 12px;
-  font-weight: 600; cursor: pointer;
-  &:hover { background: $accent-hover; }
-}
-
-.s-hint { font-size: 10.5px; color: $text-muted; margin-top: 5px; }
-.s-status { font-size: 11px; margin-top: 6px; &.ok { color: $success; } &.err { color: $error; } }
-
-// Toggle switch
-.s-toggle-row {
-  @include flex-between; padding: 6px 0; font-size: 12.5px; color: $text-secondary;
-}
-.s-toggle {
-  position: relative; width: 34px; height: 18px; display: inline-block;
-  input { opacity: 0; width: 0; height: 0; }
-}
-.s-slider {
-  position: absolute; inset: 0; background: $bg-base; border: 1px solid $border;
-  border-radius: 9px; cursor: pointer; transition: all 150ms;
-  &::before {
-    content: ''; position: absolute; width: 12px; height: 12px;
-    left: 2px; bottom: 2px; background: $text-muted;
-    border-radius: 50%; transition: all 150ms;
-  }
-}
-.s-toggle input:checked + .s-slider { background: $accent; border-color: $accent; }
-.s-toggle input:checked + .s-slider::before { transform: translateX(16px); background: white; }
-
-.s-about p { font-size: 12px; color: $text-secondary; margin-bottom: 4px; }
-
-// ─── UTILITIES ────────────────────────────────────────────────
-.hidden { display: none !important; }
-
-// ─── CONTEXT BAR (shows attached pages/tabs) ──────────────────
-.context-bar {
-  display: flex; flex-wrap: wrap; gap: 5px; padding-bottom: 6px;
-  &:empty { display: none; }
-}
-.context-chip {
-  display: flex; align-items: center; gap: 4px;
-  padding: 3px 8px; background: $accent-soft; border: 1px solid rgba($accent, 0.2);
-  border-radius: 4px; font-size: 10.5px; color: $accent;
-  max-width: 200px; overflow: hidden;
-  .chip-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .chip-remove { cursor: pointer; opacity: 0.6; &:hover { opacity: 1; } }
-}
+.memory-badge { font-size: 11px; color: $text-muted; }
+.input-hint { font-size: 11px; color: $text-muted; }
 
 // ─── MULTI-TAB PICKER ─────────────────────────────────────────
 .tab-picker {
   display: none;
   position: fixed; bottom: 80px; left: 8px; right: 8px;
-  background: $bg-surface; border: 1px solid $border-light;
-  border-radius: $radius-lg; box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  background: $white; border: 1px solid $border;
+  border-radius: $radius-xl; box-shadow: $shadow-md;
   flex-direction: column; max-height: 320px; z-index: 50;
   &.open { display: flex; }
 }
 .tab-picker-header {
-  @include flex-between; padding: 12px 14px;
-  border-bottom: 1px solid $border;
-  h3 { font-size: 13px; font-weight: 600; }
+  @include flex-between; padding: 14px 16px; border-bottom: 1px solid $border;
+  h3 { font-size: 14px; font-weight: 600; color: $text-primary; }
 }
-.tab-picker-list {
-  flex: 1; overflow-y: auto; padding: 8px;
-}
+.tab-picker-list { flex: 1; overflow-y: auto; padding: 8px; }
 .tab-picker-item {
   display: flex; align-items: center; gap: 10px;
-  padding: 8px 10px; border-radius: 6px; cursor: pointer;
-  transition: background 100ms;
-  &:hover { background: $bg-elevated; }
+  padding: 10px 12px; border-radius: $radius; cursor: pointer;
+  &:hover { background: $bg-hover; }
   &.selected { background: $accent-soft; }
-  input[type="checkbox"] { accent-color: $accent; width: 15px; height: 15px; flex-shrink: 0; }
+  input[type="checkbox"] { accent-color: $accent; width: 16px; height: 16px; flex-shrink: 0; cursor: pointer; }
 }
-.tab-picker-title {
-  flex: 1; font-size: 12px; color: $text-primary;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.tab-picker-url {
-  font-size: 10px; color: $text-muted;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  max-width: 200px;
-}
+.tab-picker-title { font-size: 13px; color: $text-primary; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tab-picker-url { font-size: 11px; color: $text-muted; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tab-picker-footer {
-  @include flex-between; padding: 10px 14px;
-  border-top: 1px solid $border;
-  span { font-size: 11px; color: $text-muted; }
+  @include flex-between; padding: 12px 16px; border-top: 1px solid $border;
+  span { font-size: 12px; color: $text-muted; }
 }
+
+// ─── SETTINGS PANEL ───────────────────────────────────────────
+.settings-panel { position: fixed; inset: 0; z-index: 100; display: none; &.open { display: block; } }
+.settings-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.3); }
+.settings-drawer {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 300px;
+  background: $white; border-left: 1px solid $border;
+  display: flex; flex-direction: column;
+  animation: slideIn 0.2s ease;
+}
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+.settings-header { @include flex-between; padding: 16px; border-bottom: 1px solid $border; h2 { font-size: 16px; font-weight: 600; } }
+.settings-body { flex: 1; overflow-y: auto; padding: 16px; }
+
+.s-section { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid $border-light; &:last-child { border-bottom: none; } }
+.s-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: $text-muted; margin-bottom: 10px; }
+.s-select, .s-input {
+  width: 100%; padding: 9px 12px; background: $bg-input; border: 1px solid $border;
+  border-radius: $radius; color: $text-primary; font-size: 13px; outline: none;
+  &:focus { border-color: $accent; box-shadow: 0 0 0 3px $accent-soft; }
+}
+.s-select { cursor: pointer; }
+.s-key-row { display: flex; gap: 8px; .s-input { flex: 1; font-family: monospace; } }
+.s-btn {
+  padding: 9px 16px; background: $accent; color: white;
+  border: none; border-radius: $radius; font-size: 13px;
+  font-weight: 600; cursor: pointer; &:hover { background: $accent-hover; }
+}
+.s-hint { font-size: 11px; color: $text-muted; margin-top: 5px; }
+.s-status { font-size: 12px; margin-top: 6px; &.ok { color: $success; } &.err { color: $error; } }
+
+.s-toggle-row { @include flex-between; padding: 8px 0; font-size: 13px; color: $text-primary; }
+.s-toggle { position: relative; width: 36px; height: 20px; display: inline-block; input { opacity: 0; width: 0; height: 0; } }
+.s-slider {
+  position: absolute; inset: 0; background: #d1d5db; border-radius: 10px; cursor: pointer; transition: all 150ms;
+  &::before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: all 150ms; }
+}
+.s-toggle input:checked + .s-slider { background: $accent; }
+.s-toggle input:checked + .s-slider::before { transform: translateX(16px); }
+
+.s-about p { font-size: 13px; color: $text-secondary; margin-bottom: 4px; }
+
+// ─── UTILITIES ────────────────────────────────────────────────
+.hidden { display: none !important; }

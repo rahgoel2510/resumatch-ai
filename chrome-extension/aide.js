@@ -206,6 +206,7 @@ function main() {
     bar.querySelectorAll('.chip-remove').forEach(el => {
       el.addEventListener('click', () => { contextSources.splice(+el.dataset.idx, 1); renderContextBar(); });
     });
+    updateMemoryBadge();
   }
 
   async function togglePageContext() {
@@ -575,7 +576,13 @@ function main() {
   }
 
   function scrollToBottom() { dom.chatArea.scrollTop = dom.chatArea.scrollHeight; }
-  function updateMemoryBadge() { dom.memoryCount.textContent = state.sessionMemory.length; }
+  function updateMemoryBadge() {
+    const tabLabel = document.getElementById('tabContextLabel');
+    if (tabLabel) {
+      const n = contextSources.length;
+      tabLabel.textContent = n > 0 ? `${n} source${n > 1 ? 's' : ''} attached` : 'No tabs selected';
+    }
+  }
 
   function formatText(text) {
     if (!text) return '';

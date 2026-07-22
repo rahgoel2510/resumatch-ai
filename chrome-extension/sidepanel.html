@@ -60,16 +60,15 @@
 
         <!-- Welcome State (visible when no messages) -->
         <div id="welcomeState" class="welcome-state">
-          <div class="welcome-icon">🤖</div>
-          <h2 class="welcome-title">How can I help?</h2>
-          <p class="welcome-desc">I can read the current page, summarize content, answer questions, and more.</p>
+          <div class="welcome-icon">✨</div>
+          <h2 class="welcome-title">All set. Let's go.</h2>
+          <p class="welcome-desc">SUGGESTED PROMPTS</p>
 
-          <!-- Suggested Prompts (Amazon Q style chips) -->
+          <!-- Suggested Prompts (Amazon Q style — stacked cards) -->
           <div class="prompt-chips">
-            <button class="chip" data-prompt="Summarize this page">📄 Summarize this page</button>
-            <button class="chip" data-prompt="What are the key points on this page?">🔑 Key points from page</button>
-            <button class="chip" data-prompt="Extract all links and headings from this page">🔗 Extract links & headings</button>
-            <button class="chip" data-prompt="Explain this page in simple terms">💡 Explain simply</button>
+            <button class="chip" data-prompt="Extract key points from the current webpage">📋 Extract key points from the current webpage</button>
+            <button class="chip" data-prompt="Explain the current webpage with context">💡 Explain the current webpage with context</button>
+            <button class="chip" data-prompt="Summarize this page">📄 Summarize</button>
           </div>
         </div>
 
@@ -107,8 +106,8 @@
         </div>
 
         <div class="input-meta">
-          <span id="memoryBadge" class="memory-badge">💭 <span id="memoryCount">0</span> messages</span>
-          <span class="input-hint">Enter to send • Shift+Enter new line • /help for commands</span>
+          <span id="memoryBadge" class="memory-badge"><span id="tabContextLabel">No tabs selected</span></span>
+          <span class="input-hint">Enter to send</span>
         </div>
       </footer>
 
