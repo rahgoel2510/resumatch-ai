@@ -556,9 +556,15 @@ function main() {
     dom.welcomeState.style.display = 'none';
     dom.chatMessages.style.display = 'flex';
 
-    // If page context is active but not yet grabbed, grab it now
-    if (state.pageContextActive && !state.pageContext) {
-      state.pageContext = await grabPageContext();
+    // Auto-include current page if no context sources are attached
+    if (contextSources.length === 0) {
+      const pageText = await grabPageContext();
+      if (pageText) {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        contextSources.push({ type: 'page', title: tab?.title || 'Current page', content: pageText });
+        dom.pageCtxBtn.classList.add('active');
+        renderContextBar();
+      }
     }
 
     // Render user message
@@ -873,22 +879,10 @@ function main() {
     setTimeout(() => { dom.settingsKeyStatus.textContent = ''; }, 2500);
   });
 
-  // Suggested prompt chips
+  // Suggested prompt chips — just send the prompt, page context is auto-included
   document.querySelectorAll('.chip').forEach(chip => {
-    chip.addEventListener('click', async () => {
-      const prompt = chip.dataset.prompt;
-      // All chips that mention "page" auto-include page context
-      if (prompt.toLowerCase().includes('page')) {
-        dom.pageCtxBtn.classList.add('active');
-        state.pageContext = await grabPageContext();
-        state.pageContextActive = !!state.pageContext;
-        if (!state.pageContext) {
-          renderMessage('ai', '⚠️ Could not read the current page. Make sure you\'re on a regular webpage (not a Chrome settings page).');
-          dom.pageCtxBtn.classList.remove('active');
-          return;
-        }
-      }
-      sendMessage(prompt);
+    chip.addEventListener('click', () => {
+      sendMessage(chip.dataset.prompt);
     });
   });
 
