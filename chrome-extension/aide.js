@@ -248,44 +248,56 @@ function main() {
 
   async function openTabPicker() {
     tabPickerDom.picker.classList.add('open');
-    tabPickerDom.list.innerHTML = '<div style="padding:12px;color:var(--text-muted)">Loading tabs...</div>';
+    tabPickerDom.list.innerHTML = '<div style="padding:12px;color:#6b7394;font-size:12px">Loading tabs...</div>';
 
     const tabs = await chrome.tabs.query({ currentWindow: true });
     tabPickerDom.list.innerHTML = '';
 
     tabs.forEach(tab => {
-      // Skip chrome:// pages
-      if (tab.url && (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://'))) return;
+      // Skip chrome:// and extension pages
+      if (tab.url && (tab.url.startsWith('chrome://') || tab.url.startsWith('chrome-extension://') || tab.url.startsWith('about:'))) return;
 
       const item = document.createElement('div');
       item.className = 'tab-picker-item';
-      item.innerHTML = `
-        <input type="checkbox" data-tab-id="${tab.id}" data-tab-title="${escHtml(tab.title || '')}">
-        <div>
-          <div class="tab-picker-title">${escHtml(tab.title || 'Untitled')}</div>
-          <div class="tab-picker-url">${escHtml(tab.url || '')}</div>
-        </div>
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.dataset.tabId = tab.id;
+      checkbox.dataset.tabTitle = tab.title || 'Untitled';
+
+      const info = document.createElement('div');
+      info.innerHTML = `
+        <div class="tab-picker-title">${escHtml(tab.title || 'Untitled')}</div>
+        <div class="tab-picker-url">${escHtml((tab.url || '').substring(0, 60))}</div>
       `;
+
+      item.appendChild(checkbox);
+      item.appendChild(info);
+
+      // Click anywhere on item toggles checkbox
       item.addEventListener('click', (e) => {
-        if (e.target.type !== 'checkbox') {
-          const cb = item.querySelector('input[type="checkbox"]');
-          cb.checked = !cb.checked;
+        if (e.target !== checkbox) {
+          checkbox.checked = !checkbox.checked;
         }
+        item.classList.toggle('selected', checkbox.checked);
         updateTabPickerCount();
       });
+
       tabPickerDom.list.appendChild(item);
     });
+
+    updateTabPickerCount();
   }
 
   function updateTabPickerCount() {
-    const checked = tabPickerDom.list.querySelectorAll('input:checked');
+    const checked = tabPickerDom.list.querySelectorAll('input[type="checkbox"]:checked');
     const n = checked.length;
     tabPickerDom.count.textContent = `${n} selected`;
     tabPickerDom.confirm.disabled = n === 0;
   }
 
   async function confirmTabPicker() {
-    const checked = tabPickerDom.list.querySelectorAll('input:checked');
+    const checked = tabPickerDom.list.querySelectorAll('input[type="checkbox"]:checked');
     tabPickerDom.picker.classList.remove('open');
 
     for (const cb of checked) {
